@@ -19,13 +19,13 @@ TARGETS = ['Peso Prom. Final', 'Porc Consumo', 'ICA', 'Por_Mort._Final']
 def load_resources():
     """Carga el modelo y los escaladores para evitar recargas constantes."""
     try:
-        model = load_model("modelo_9vars_multisalida.keras")
-        X_scaler = joblib.load("X_scaler_9vars.pkl")
-        y_scaler = joblib.load("y_scaler_4targets.pkl")
+        model = load_model("modelos/modelo_9vars_multisalida.keras")
+        X_scaler = joblib.load("modelos/X_scaler_9vars.pkl")
+        y_scaler = joblib.load("modelos/y_scaler_4targets.pkl")
         le_area = None
         area_options = None
         try:
-            le_area = joblib.load("label_encoder_tipo_area.pkl")
+            le_area = joblib.load("modelos/label_encoder_tipo_area.pkl")
             area_options = le_area.classes_
         except FileNotFoundError:
             pass
