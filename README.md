@@ -71,7 +71,7 @@ La app procesará todos los registros y podrás descargar las predicciones en fo
 1. Clona el repositorio:
 
    ```bash
-   git clone https://github.com/tuusuario/dl_project.git
+   git clone https://github.com/TotoBlunt/Sistema-de-DeepLearning-MLP-para-Avicola.git
    cd dl_project
    ```
 
@@ -116,5 +116,6 @@ Este proyecto está bajo la licencia MIT.
 ---
 
 ## Contacto
+
 
 Para dudas o sugerencias, puedes abrir un issue en este repositorio.
