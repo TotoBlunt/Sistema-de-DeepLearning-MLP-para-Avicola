@@ -83,10 +83,21 @@ if uploaded_file is not None:
         if uploaded_file.name.endswith('.csv'):
             df = pd.read_csv(uploaded_file)
         else:
-            # Para xlsm y otros formatos Excel, usa openpyxl
-            df = pd.read_excel(uploaded_file, engine='openpyxl')
-        # Conserva solo la primera ocurrencia de cada columna relevante
-        df = df.loc[:, ~df.columns.duplicated()]
+            # Solución robusta para duplicados: leer sin encabezado y reconstruir
+            import openpyxl
+            wb = openpyxl.load_workbook(uploaded_file)
+            ws = wb.active
+            data = list(ws.values)
+            # Primera fila: nombres de columna
+            columns = []
+            seen = set()
+            for col in data[0]:
+                if col not in seen:
+                    columns.append(col)
+                    seen.add(col)
+            # Resto de filas: datos
+            rows = [row[:len(columns)] for row in data[1:]]
+            df = pd.DataFrame(rows, columns=columns)
     except Exception as e:
         st.error(f"Error al leer el archivo: {e}")
         st.stop()
