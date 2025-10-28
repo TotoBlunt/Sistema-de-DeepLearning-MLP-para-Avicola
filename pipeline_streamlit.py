@@ -84,6 +84,8 @@ if uploaded_file is not None:
             df = pd.read_csv(uploaded_file)
         else:
             df = pd.read_excel(uploaded_file)
+            # Elimina columnas duplicadas
+            df = df.loc[:, ~df.columns.duplicated()]
     except Exception as e:
         st.error(f"Error al leer el archivo: {e}")
         st.stop()
