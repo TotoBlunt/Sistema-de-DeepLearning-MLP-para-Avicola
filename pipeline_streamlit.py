@@ -97,7 +97,13 @@ if uploaded_file is not None:
 
     df_clean = clean_data(df, le_area)
     results_df = predict_batch(df_clean, model, X_scaler, y_scaler)
+    # Renombrar columnas de resultados
+    new_target_names = [f"{t}_Pred" for t in TARGETS]
+    results_df.columns = new_target_names
+
+    # Concatenar
     df_out = pd.concat([df_clean.reset_index(drop=True), results_df], axis=1)
+    
 
     if modo == "cluster":
         kmeans = KMeans(n_clusters=n_clusters, random_state=42)
