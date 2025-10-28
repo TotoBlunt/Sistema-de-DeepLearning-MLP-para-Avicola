@@ -79,13 +79,13 @@ if modo == "cluster":
 if modo == "ranking":
     rank_by = st.selectbox("Columna para ranking", TARGETS)
 
-if uploaded_file is not None:
+
     
-    uploaded_file = st.file_uploader(
+uploaded_file = st.file_uploader(
         "Sube tu archivo Excel (.xlsx) o CSV (.csv) con las variables de entrada.",
         type=["xlsx", "csv","xlsm"]
     )
-
+if uploaded_file is not None:
     try:
         if uploaded_file.name.endswith('.csv'):
                 df = pd.read_csv(uploaded_file)
