@@ -63,7 +63,8 @@ model, X_scaler, y_scaler, le_area, area_options = load_resources()
 
 uploaded_file = st.file_uploader(
     "Sube tu archivo Excel (.xlsx) o CSV (.csv) con las variables de entrada.",
-    type=["xlsx", "csv", "xlsm"]
+    type=["xlsx", "csv", "xlsm"],
+    key="file_uploader_pipeline"
 )
 
 modo = st.selectbox(
