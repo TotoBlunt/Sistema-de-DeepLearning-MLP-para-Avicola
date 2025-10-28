@@ -85,15 +85,15 @@ if uploaded_file is not None:
         "Sube tu archivo Excel (.xlsx) o CSV (.csv) con las variables de entrada.",
         type=["xlsx", "csv","xlsm"]
     )
-    if uploaded_file is not None:
-        try:
-            if uploaded_file.name.endswith('.csv'):
+
+    try:
+        if uploaded_file.name.endswith('.csv'):
                 df = pd.read_csv(uploaded_file)
-            else:
+        else:
                 df = pd.read_excel(uploaded_file)
-        except Exception as e:
-            st.error(f"Error al leer el archivo: {e}")
-            st.stop()
+    except Exception as e:
+        st.error(f"Error al leer el archivo: {e}")
+        st.stop()
 
     missing_cols = [f for f in FEATURES if f not in df.columns]
     if missing_cols:
