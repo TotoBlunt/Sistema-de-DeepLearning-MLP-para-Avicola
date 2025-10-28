@@ -83,8 +83,8 @@ if uploaded_file is not None:
         if uploaded_file.name.endswith('.csv'):
             df = pd.read_csv(uploaded_file)
         else:
-            # Para xlsm y otros formatos Excel, usa openpyxl y mangle_dupe_cols
-            df = pd.read_excel(uploaded_file, engine='openpyxl', mangle_dupe_cols=True)
+            # Para xlsm y otros formatos Excel, usa openpyxl
+            df = pd.read_excel(uploaded_file, engine='openpyxl')
         # Conserva solo la primera ocurrencia de cada columna relevante
         df = df.loc[:, ~df.columns.duplicated()]
     except Exception as e:
