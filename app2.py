@@ -4,6 +4,8 @@ import numpy as np
 import joblib
 import tensorflow as tf
 from tensorflow.keras.models import load_model
+import matplotlib.pyplot as plt
+from utils.mlp_utils import calcular_metricas, mostrar_metricas, graficar_metricas
 
 # ====================================================================
 # CONFIGURACIÓN Y CARGA DE RECURSOS (USANDO CACHING DE STREAMLIT)
@@ -57,6 +59,17 @@ st.set_page_config(
 st.title("🧠 Predictor de Rendimiento Acuícola con Redes Neuronales")
 st.markdown("---")
 st.markdown("Utilice el formulario o cargue un archivo para predecir **4 variables de rendimiento** mediante un modelo MLP optimizado.")
+
+# =================== MÉTRICAS Y GRÁFICAS ===================
+st.sidebar.header("Visualización de Métricas")
+metricas_opciones = [
+    "MAE", "MSE", "RMSE", "MAPE", "R2", "Boxplot de errores", "Dispersión real vs predicho", "Barras de métricas", "Barras de R2", "Curva de pérdida (Loss)"
+]
+metricas_seleccionadas = st.sidebar.multiselect(
+    "Selecciona las métricas y gráficas a mostrar:",
+    metricas_opciones,
+    default=["MAE", "R2"]
+)
 
 if model is None:
     st.stop()
@@ -115,6 +128,20 @@ if modo_prediccion == "Manual":
             st.table(results_df.set_index('Variable'))
             st.balloons()
 
+            # Mostrar métricas y gráficas si el usuario lo solicita
+            st.markdown("---")
+            st.subheader("Métricas y Gráficas de Validación")
+            # Simulación de datos reales y predichos para demo
+            # En producción, usar datos reales y predichos del modelo
+            y_true_df = pd.DataFrame([input_values], columns=FEATURES)
+            y_pred_np = np.array([predictions])
+            metricas = calcular_metricas(y_true_df, y_pred_np, TARGETS)
+            if metricas_seleccionadas:
+                if any(m in ["MAE", "MSE", "RMSE", "MAPE", "R2"] for m in metricas_seleccionadas):
+                    mostrar_metricas(metricas, TARGETS)
+                if "Boxplot de errores" in metricas_seleccionadas or "Dispersión real vs predicho" in metricas_seleccionadas or "Barras de métricas" in metricas_seleccionadas or "Barras de R2" in metricas_seleccionadas or "Curva de pérdida (Loss)" in metricas_seleccionadas:
+                    graficar_metricas(metricas, y_true_df, y_pred_np, TARGETS, history=None)
+
 # =================== MODO ARCHIVO ===================
 elif modo_prediccion == "Archivo (Excel/CSV)":
     st.header("Carga de Archivo de Datos")
@@ -163,3 +190,17 @@ elif modo_prediccion == "Archivo (Excel/CSV)":
                     file_name="predicciones.csv",
                     mime="text/csv"
                 )
+
+                # Mostrar métricas y gráficas si el usuario lo solicita
+                st.markdown("---")
+                st.subheader("Métricas y Gráficas de Validación")
+                # Simulación de datos reales y predichos para demo
+                # En producción, usar datos reales y predichos del modelo
+                y_true_df = df_input[FEATURES]
+                y_pred_np = y_pred_original
+                metricas = calcular_metricas(y_true_df, y_pred_np, TARGETS)
+                if metricas_seleccionadas:
+                    if any(m in ["MAE", "MSE", "RMSE", "MAPE", "R2"] for m in metricas_seleccionadas):
+                        mostrar_metricas(metricas, TARGETS)
+                    if "Boxplot de errores" in metricas_seleccionadas or "Dispersión real vs predicho" in metricas_seleccionadas or "Barras de métricas" in metricas_seleccionadas or "Barras de R2" in metricas_seleccionadas or "Curva de pérdida (Loss)" in metricas_seleccionadas:
+                        graficar_metricas(metricas, y_true_df, y_pred_np, TARGETS, history=None)
