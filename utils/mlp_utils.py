@@ -65,19 +65,42 @@ def invertir_escalado(y_scaled, scaler):
     return scaler.inverse_transform(y_scaled)
 
 def calcular_metricas(y_true_df, y_pred_np, nombres):
-    """Calcula métricas de regresión para cada variable."""
-    metricas = { 'MAE': [], 'MSE': [], 'RMSE': [], 'MAPE': [], 'R2': [] }
+    """Calcula métricas de regresión para cada variable objetivo.
+
+
+    Parámetros
+    ----------
+    y_true_df : pd.DataFrame
+    DataFrame con los valores reales.
+    y_pred_np : np.ndarray
+    Array con los valores predichos.
+    nombres : list
+    Lista con los nombres de las variables objetivo.
+
+
+    Retorna
+    -------
+    dict
+    Diccionario con las métricas (MAE, MSE, RMSE, MAPE, R²) para cada variable.
+    """
+    metricas = {'MAE': [], 'MSE': [], 'RMSE': [], 'MAPE': [], 'R2': []}
+
+
     for i, col in enumerate(nombres):
         mae = mean_absolute_error(y_true_df[col], y_pred_np[:, i])
         mse = mean_squared_error(y_true_df[col], y_pred_np[:, i])
         rmse = np.sqrt(mse)
         mape = mean_absolute_percentage_error(y_true_df[col], y_pred_np[:, i])
         r2 = r2_score(y_true_df[col], y_pred_np[:, i])
-        metricas['MAE'].append(mae)
-        metricas['MSE'].append(mse)
-        metricas['RMSE'].append(rmse)
-        metricas['MAPE'].append(mape)
-        metricas['R2'].append(r2)
+
+
+    metricas['MAE'].append(mae)
+    metricas['MSE'].append(mse)
+    metricas['RMSE'].append(rmse)
+    metricas['MAPE'].append(mape)
+    metricas['R2'].append(r2)
+
+
     return metricas
 
 def mostrar_metricas(metricas, nombres):
@@ -133,7 +156,12 @@ def validacion_cruzada(X, y, features, targets, X_scaler, y_scaler, n_splits=5):
     return r2_scores
 
 def graficar_metricas(metricas, y_true_df, y_pred_np, nombres, history=None):
-    """
+    """Genera y muestra gráficas de validación del modelo dentro de Streamlit.
+
+
+    Incluye boxplot de errores, dispersión real vs predicho, barras de métricas, barras de R² y curva de pérdida.
+
+
     Parámetros
     ----------
     metricas : dict
@@ -211,5 +239,5 @@ def graficar_metricas(metricas, y_true_df, y_pred_np, nombres, history=None):
         ax.legend()
         ax.grid(True)
         st.pyplot(fig)
-            
+                
             
