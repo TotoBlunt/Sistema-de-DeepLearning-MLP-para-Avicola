@@ -191,3 +191,5 @@ def graficar_metricas(metricas, y_true_df, y_pred_np, nombres, history):
         plt.grid(True)
         plt.tight_layout()
         plt.show()
+        
+        
