@@ -9,6 +9,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 import joblib
 import matplotlib.pyplot as plt
+import streamlit as st
 
 def cargar_datos(filepath, features, targets):
     """Carga y limpia los datos desde un archivo Excel. Codifica 'Area' si es categórica."""
@@ -80,10 +81,18 @@ def calcular_metricas(y_true_df, y_pred_np, nombres):
     return metricas
 
 def mostrar_metricas(metricas, nombres):
-    """Imprime las métricas calculadas por variable."""
-    print("\n📈 Evaluación del modelo (en escala original):")
-    for i, col in enumerate(nombres):
-        print(f"{col}: MAE={metricas['MAE'][i]:.4f}, R²={metricas['R2'][i]:.4f}, MSE={metricas['MSE'][i]:.4f}, RMSE={metricas['RMSE'][i]:.4f}, MAPE={metricas['MAPE'][i]:.4f}")
+    """Muestra las métricas en formato tabla dentro de Streamlit.
+
+
+    Parámetros
+    ----------
+    metricas : dict
+    Diccionario con las métricas calculadas.
+    nombres : list
+    Lista con los nombres de las variables objetivo.
+    """
+    df_metrics = pd.DataFrame(metricas, index=nombres)
+    st.dataframe(df_metrics.style.format("{:.4f}").highlight_max(axis=0, color='lightgreen'))
 
 def guardar_modelo_scalers(model, X_scaler, y_scaler, le_area):
     """Guarda el modelo y los escaladores en disco."""
@@ -118,78 +127,89 @@ def validacion_cruzada(X, y, features, targets, X_scaler, y_scaler, n_splits=5):
         for i, col in enumerate(targets):
             r2 = r2_score(y_val_original[col], y_pred_original[:, i])
             r2_scores[col].append(r2)
-    print("\n📊 Validación Cruzada (promedio de R² en 5 folds):")
+    st.write("\n📊 Validación Cruzada (promedio de R² en 5 folds):")
     for col in targets:
-        print(f"{col}: R² promedio = {np.mean(r2_scores[col]):.4f} ± {np.std(r2_scores[col]):.4f}")
+        st.write(f"{col}: R² promedio = {np.mean(r2_scores[col]):.4f} ± {np.std(r2_scores[col]):.4f}")
     return r2_scores
 
-def graficar_metricas(metricas, y_true_df, y_pred_np, nombres, history):
-    """Grafica boxplot de errores, dispersión real vs predicho, barras de métricas y curva de pérdida."""
-    import pandas as pd
+def graficar_metricas(metricas, y_true_df, y_pred_np, nombres, history=None):
+    """
+    Parámetros
+    ----------
+    metricas : dict
+    Métricas calculadas.
+    y_true_df : pd.DataFrame
+    Valores reales.
+    y_pred_np : np.ndarray
+    Valores predichos.
+    nombres : list
+    Nombres de las variables objetivo.
+    history : keras.callbacks.History, opcional
+    Historial de entrenamiento (si existe).
+    """
 
-    # Boxplot de errores
-    errores = {
-        col: y_true_df[col].values - y_pred_np[:, i]
-        for i, col in enumerate(nombres)
-    }
+
+    # ========== Boxplot de errores ==========
+    st.subheader("📦 Boxplot de errores")
+    errores = {col: y_true_df[col].values - y_pred_np[:, i] for i, col in enumerate(nombres)}
     df_err = pd.DataFrame(errores)
-    plt.figure(figsize=(8,5))
-    df_err.boxplot()
-    plt.title("Boxplot de errores por variable")
-    plt.ylabel("Error (Real - Predicho)")
-    plt.grid(True, linestyle="--", alpha=0.4)
-    plt.show()
+    fig, ax = plt.subplots(figsize=(8, 5))
+    df_err.boxplot(ax=ax)
+    ax.set_title("Boxplot de errores por variable")
+    ax.set_ylabel("Error (Real - Predicho)")
+    st.pyplot(fig)
 
-    # Dispersión real vs predicho
-    plt.figure(figsize=(12,8))
+
+    # ========== Dispersión Real vs Predicho ==========
+    st.subheader("📈 Dispersión: Real vs Predicho")
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+    axes = axes.flatten()
     for i, col in enumerate(nombres):
-        plt.subplot(2,2,i+1)
-        plt.scatter(y_true_df[col], y_pred_np[:,i], alpha=0.7)
-        plt.plot([y_true_df[col].min(), y_true_df[col].max()],
-                [y_true_df[col].min(), y_true_df[col].max()], 'r--')
-        plt.xlabel("Valor real")
-        plt.ylabel("Valor predicho")
-        plt.title(f"{col}: Real vs. Predicho")
-        plt.grid(True, linestyle="--", alpha=0.4)
-    plt.tight_layout()
-    plt.show()
-
-    # Barras de métricas con valores en cada barra
-    df_metrics = pd.DataFrame(metricas, index=nombres)
-    ax = df_metrics[['MAE', 'MSE', 'RMSE', 'MAPE']].plot(kind='bar', figsize=(10,6), logy=True)
-    plt.title("Comparación de métricas de error")
-    plt.ylabel("Valor (escala log)")
-    plt.grid(True, linestyle="--", alpha=0.4)
-    # Mostrar valores en cada barra
-    for i, metric in enumerate(['MAE', 'MSE', 'RMSE', 'MAPE']):
-        for j, value in enumerate(df_metrics[metric]):
-            ax.text(j + (i - 1.5) * 0.18, value * 1.05, f"{value:.4f}", ha="center", va="bottom", fontsize=9, color="black", fontweight="bold")
-    plt.tight_layout()
-    plt.show()
-
-    # Barras de R2 con valores en cada barra
-    plt.figure(figsize=(8,5))
-    bars = plt.bar(nombres, metricas['R2'], color='skyblue')
-    for i, v in enumerate(metricas['R2']):
-        plt.text(i, v+0.01, f"{v:.3f}", ha='center', fontweight='bold', fontsize=10)
-    plt.title("R² por variable")
-    plt.ylim(0, 1.05)
-    plt.ylabel("R²")
-    plt.grid(True, linestyle="--", alpha=0.4)
-    plt.tight_layout()
-    plt.show()
-
-    # Curva de pérdida (Loss)
-    if history:
-        plt.figure(figsize=(6,4))
-        plt.plot(history.history['loss'], label='Entrenamiento')
-        plt.plot(history.history['val_loss'], label='Validación')
-        plt.title("Curva de pérdida (Loss)")
-        plt.xlabel("Épocas")
-        plt.ylabel("MSE")
-        plt.legend()
-        plt.grid(True)
+        axes[i].scatter(y_true_df[col], y_pred_np[:, i], alpha=0.7)
+        axes[i].plot([y_true_df[col].min(), y_true_df[col].max()],
+        [y_true_df[col].min(), y_true_df[col].max()], 'r--')
+        axes[i].set_xlabel("Valor real")
+        axes[i].set_ylabel("Valor predicho")
+        axes[i].set_title(f"{col}")
         plt.tight_layout()
-        plt.show()
-        
-        
+        st.pyplot(fig)
+
+
+    # ========== Barras de métricas ==========
+    st.subheader("📊 Comparación de métricas de error")
+    df_metrics = pd.DataFrame(metricas, index=nombres)
+    fig, ax = plt.subplots(figsize=(10, 6))
+    df_metrics[['MAE', 'MSE', 'RMSE', 'MAPE']].plot(kind='bar', ax=ax, logy=True)
+    ax.set_title("Comparación de métricas (escala log)")
+    ax.set_ylabel("Valor")
+    ax.grid(True, linestyle="--", alpha=0.5)
+    st.pyplot(fig)
+
+
+    # ========== Barras de R² ==========
+    st.subheader("🎯 R² por variable")
+    fig, ax = plt.subplots(figsize=(8, 5))
+    bars = ax.bar(nombres, metricas['R2'], color='skyblue')
+    for i, v in enumerate(metricas['R2']):
+        ax.text(i, v + 0.01, f"{v:.3f}", ha='center', fontweight='bold')
+        ax.set_ylim(0, 1.05)
+        ax.set_ylabel("R²")
+        ax.set_title("R² por variable")
+        ax.grid(True, linestyle="--", alpha=0.4)
+        st.pyplot(fig)
+
+
+    # ========== Curva de pérdida ==========
+    if history is not None and hasattr(history, 'history'):
+        st.subheader("📉 Curva de pérdida (Loss)")
+        fig, ax = plt.subplots(figsize=(6, 4))
+        ax.plot(history.history['loss'], label='Entrenamiento')
+        ax.plot(history.history['val_loss'], label='Validación')
+        ax.set_title("Evolución del MSE durante el entrenamiento")
+        ax.set_xlabel("Épocas")
+        ax.set_ylabel("MSE")
+        ax.legend()
+        ax.grid(True)
+        st.pyplot(fig)
+            
+            
