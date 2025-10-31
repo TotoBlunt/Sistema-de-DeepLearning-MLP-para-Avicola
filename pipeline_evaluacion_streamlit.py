@@ -163,7 +163,7 @@ if uploaded_file is not None:
                 try:
                     st.write("Boxplot de errores")
                     fig = plot_boxplot_errores(df_clean[TARGETS], results_df.values, TARGETS)
-                    st.pyplot(fig)
+                    st.pyplot(fig.figure if hasattr(fig, 'figure') else fig)
                 except Exception as e:
                     st.info(f"No se pudo generar el boxplot: {e}")
             # Dispersión real vs predicho
@@ -171,7 +171,7 @@ if uploaded_file is not None:
                 try:
                     st.write("Dispersión real vs predicho")
                     fig = plot_dispersion(df_clean[TARGETS], results_df.values, TARGETS)
-                    st.pyplot(fig)
+                    st.pyplot(fig.figure if hasattr(fig, 'figure') else fig)
                 except Exception as e:
                     st.info(f"No se pudo generar la dispersión: {e}")
             # Barras de métricas
@@ -189,7 +189,7 @@ if uploaded_file is not None:
                         mape = np.mean(np.abs((y_true - y_pred) / y_true))
                         metricas_batch[var] = {"MAE": mae, "MSE": mse, "RMSE": rmse, "MAPE": mape}
                     fig = plot_barras_metricas(metricas_batch, TARGETS)
-                    st.pyplot(fig)
+                    st.pyplot(fig.figure if hasattr(fig, 'figure') else fig)
                 except Exception as e:
                     st.info(f"No se pudo generar las barras de métricas: {e}")
             # Barras de R2
@@ -204,7 +204,7 @@ if uploaded_file is not None:
                         r2 = 1 - np.sum((y_true - y_pred)**2) / np.sum((y_true - np.mean(y_true))**2)
                         metricas_batch[var] = {"R2": r2}
                     fig = plot_barras_r2(metricas_batch, TARGETS)
-                    st.pyplot(fig)
+                    st.pyplot(fig.figure if hasattr(fig, 'figure') else fig)
                 except Exception as e:
                     st.info(f"No se pudo generar las barras de R2: {e}")
             # Mostrar curva de pérdida si existe la imagen
