@@ -14,11 +14,12 @@ from sklearn.cluster import KMeans
 from utils.mlp_pipeline_utils import plot_boxplot_errores, plot_dispersion, plot_barras_metricas, plot_barras_r2
 
 # =================== CONFIGURACIÓN Y CARGA DE RECURSOS ===================
-MODEL_PATH = "modelos/modelo_9vars_multisalida.keras"
-X_SCALER_PATH = "modelos/X_scaler_9vars.pkl"
-Y_SCALER_PATH = "modelos/y_scaler_4targets.pkl"
-LE_AREA_PATH = "modelos/label_encoder_tipo_area.pkl"
-METRICS_PATH = "utils/metrics_9vars_multisalida.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "modelos", "modelo_9vars_multisalida.keras")
+X_SCALER_PATH = os.path.join(BASE_DIR, "modelos", "X_scaler_9vars.pkl")
+Y_SCALER_PATH = os.path.join(BASE_DIR, "modelos", "y_scaler_4targets.pkl")
+LE_AREA_PATH = os.path.join(BASE_DIR, "modelos", "label_encoder_tipo_area.pkl")
+METRICS_PATH = os.path.join(BASE_DIR, "utils", "metrics_9vars_multisalida.json")
 
 FEATURES = [
     'PorcMortSem4','PorcMortSem5', 'PorcMortSem6','PesoSem4', 'PesoSem5', 'Pob Inicial',
