@@ -1,3 +1,5 @@
+
+
 """
 mlp_pipeline_utils.py
 Funciones para el pipeline MLP multisalida.
@@ -129,3 +131,167 @@ def graficar_curvas(history, output_dir):
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, "curva_loss.png"))
     plt.close()
+
+def plot_boxplot_errores(y_true_df, y_pred_np, nombres):
+    """
+    Genera un boxplot de los errores (real - predicho) para cada variable objetivo.
+    Args:
+        y_true_df (pd.DataFrame): Valores reales de las variables objetivo.
+        y_pred_np (np.ndarray): Valores predichos por el modelo.
+        nombres (list): Lista de nombres de las variables objetivo.
+    Returns:
+        plt: Objeto matplotlib listo para mostrar con st.pyplot().
+    """
+    errores = {col: y_true_df[col].values - y_pred_np[:, i] for i, col in enumerate(nombres)}
+    df_err = pd.DataFrame(errores)
+    plt.figure(figsize=(8,5))
+    df_err.boxplot()
+    plt.title("Boxplot de errores por variable")
+    plt.ylabel("Error (Real - Predicho)")
+    plt.grid(True, linestyle="--", alpha=0.4)
+    return plt
+
+def plot_dispersion(y_true_df, y_pred_np, nombres):
+    """
+    Genera gráficos de dispersión real vs predicho para cada variable objetivo.
+    Args:
+        y_true_df (pd.DataFrame): Valores reales de las variables objetivo.
+        y_pred_np (np.ndarray): Valores predichos por el modelo.
+        nombres (list): Lista de nombres de las variables objetivo.
+    Returns:
+        plt: Objeto matplotlib listo para mostrar con st.pyplot().
+    """
+    plt.figure(figsize=(12,8))
+    for i, col in enumerate(nombres):
+        plt.subplot(2,2,i+1)
+        plt.scatter(y_true_df[col], y_pred_np[:,i], alpha=0.7)
+        plt.plot([y_true_df[col].min(), y_true_df[col].max()],
+                [y_true_df[col].min(), y_true_df[col].max()], 'r--')
+        plt.xlabel("Valor real")
+        plt.ylabel("Valor predicho")
+        plt.title(f"{col}: Real vs. Predicho")
+        plt.grid(True, linestyle="--", alpha=0.4)
+    plt.tight_layout()
+    return plt
+
+def plot_barras_metricas(metricas, nombres):
+    """
+    Genera un gráfico de barras comparando las métricas de error (MAE, MSE, RMSE, MAPE) por variable.
+    Args:
+        metricas (dict): Diccionario de métricas por variable.
+        nombres (list): Lista de nombres de las variables objetivo.
+    Returns:
+        plt: Objeto matplotlib listo para mostrar con st.pyplot().
+    """
+    df_metrics = pd.DataFrame(metricas, index=nombres)
+    # Calcular RMSE si no está
+    if 'RMSE' not in df_metrics.columns:
+        df_metrics['RMSE'] = np.sqrt(df_metrics['MSE'])
+    ax = df_metrics[['MAE', 'MSE', 'RMSE', 'MAPE']].plot(kind='bar', figsize=(10,6), logy=True)
+    plt.title("Comparación de métricas de error")
+    plt.ylabel("Valor (escala log)")
+    plt.grid(True, linestyle="--", alpha=0.4)
+    for i, metric in enumerate(['MAE', 'MSE', 'RMSE', 'MAPE']):
+        for j, value in enumerate(df_metrics[metric]):
+            ax.text(j + (i - 1.5) * 0.18, value * 1.05, f"{value:.4f}", ha="center", va="bottom", fontsize=9, color="black", fontweight="bold")
+    plt.tight_layout()
+    return plt
+
+def plot_barras_r2(metricas, nombres):
+    """
+    Genera un gráfico de barras para los valores de R² por variable objetivo.
+    Args:
+        metricas (dict): Diccionario de métricas por variable.
+        nombres (list): Lista de nombres de las variables objetivo.
+    Returns:
+        plt: Objeto matplotlib listo para mostrar con st.pyplot().
+    """
+    r2_vals = [metricas[n]['R2'] for n in nombres]
+    plt.figure(figsize=(8,5))
+    bars = plt.bar(nombres, r2_vals, color='skyblue')
+    for i, v in enumerate(r2_vals):
+        plt.text(i, v+0.01, f"{v:.3f}", ha='center', fontweight='bold', fontsize=10)
+    plt.title("R² por variable")
+    plt.ylim(0, 1.05)
+    plt.ylabel("R²")
+    plt.grid(True, linestyle="--", alpha=0.4)
+    plt.tight_layout()
+    return plt
+
+def plot_curva_loss(history):
+    """
+    Genera la curva de pérdida (loss) durante el entrenamiento y validación.
+    Args:
+        history: Objeto History de Keras tras el entrenamiento.
+    Returns:
+        plt: Objeto matplotlib listo para mostrar con st.pyplot().
+    """
+    plt.figure(figsize=(6,4))
+    plt.plot(history.history['loss'], label='Entrenamiento')
+    plt.plot(history.history['val_loss'], label='Validación')
+    plt.title("Curva de pérdida (Loss)")
+    plt.xlabel("Épocas")
+    plt.ylabel("MSE")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    return plt
+def plot_boxplot_errores(y_true_df, y_pred_np, nombres):
+    errores = {col: y_true_df[col].values - y_pred_np[:, i] for i, col in enumerate(nombres)}
+    df_err = pd.DataFrame(errores)
+    plt.figure(figsize=(8,5))
+    df_err.boxplot()
+    plt.title("Boxplot de errores por variable")
+    plt.ylabel("Error (Real - Predicho)")
+    plt.grid(True, linestyle="--", alpha=0.4)
+    return plt
+
+def plot_dispersion(y_true_df, y_pred_np, nombres):
+    plt.figure(figsize=(12,8))
+    for i, col in enumerate(nombres):
+        plt.subplot(2,2,i+1)
+        plt.scatter(y_true_df[col], y_pred_np[:,i], alpha=0.7)
+        plt.plot([y_true_df[col].min(), y_true_df[col].max()],
+                [y_true_df[col].min(), y_true_df[col].max()], 'r--')
+        plt.xlabel("Valor real")
+        plt.ylabel("Valor predicho")
+        plt.title(f"{col}: Real vs. Predicho")
+        plt.grid(True, linestyle="--", alpha=0.4)
+    plt.tight_layout()
+    return plt
+
+def plot_barras_metricas(metricas, nombres):
+    df_metrics = pd.DataFrame(metricas, index=nombres)
+    ax = df_metrics[['MAE', 'MSE', 'RMSE', 'MAPE']].plot(kind='bar', figsize=(10,6), logy=True)
+    plt.title("Comparación de métricas de error")
+    plt.ylabel("Valor (escala log)")
+    plt.grid(True, linestyle="--", alpha=0.4)
+    for i, metric in enumerate(['MAE', 'MSE', 'RMSE', 'MAPE']):
+        for j, value in enumerate(df_metrics[metric]):
+            ax.text(j + (i - 1.5) * 0.18, value * 1.05, f"{value:.4f}", ha="center", va="bottom", fontsize=9, color="black", fontweight="bold")
+    plt.tight_layout()
+    return plt
+
+def plot_barras_r2(metricas, nombres):
+    plt.figure(figsize=(8,5))
+    bars = plt.bar(nombres, metricas['R2'], color='skyblue')
+    for i, v in enumerate(metricas['R2']):
+        plt.text(i, v+0.01, f"{v:.3f}", ha='center', fontweight='bold', fontsize=10)
+    plt.title("R² por variable")
+    plt.ylim(0, 1.05)
+    plt.ylabel("R²")
+    plt.grid(True, linestyle="--", alpha=0.4)
+    plt.tight_layout()
+    return plt
+
+def plot_curva_loss(history):
+    plt.figure(figsize=(6,4))
+    plt.plot(history.history['loss'], label='Entrenamiento')
+    plt.plot(history.history['val_loss'], label='Validación')
+    plt.title("Curva de pérdida (Loss)")
+    plt.xlabel("Épocas")
+    plt.ylabel("MSE")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    return plt

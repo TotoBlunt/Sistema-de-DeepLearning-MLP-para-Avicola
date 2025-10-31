@@ -1,3 +1,4 @@
+
 """
 pipeline_evaluacion_streamlit.py
 App Streamlit para evaluar el modelo MLP multisalida, mostrar métricas y gráficas interactivas.
@@ -10,6 +11,7 @@ import os
 import json
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
+from utils.mlp_pipeline_utils import plot_boxplot_errores, plot_dispersion, plot_barras_metricas, plot_barras_r2
 
 # =================== CONFIGURACIÓN Y CARGA DE RECURSOS ===================
 MODEL_PATH = "modelos/modelo_9vars_multisalida.keras"
@@ -153,6 +155,58 @@ if uploaded_file is not None:
                             valor = metrics_dict[var].get(met, None)
                             if valor is not None:
                                 st.write(f"{var}: {valor:.4f}")
+
+            # Mostrar gráficos generados en tiempo real si hay datos suficientes
+            # Usamos los datos actuales del usuario para los gráficos
+            # Boxplot de errores
+            if "Boxplot de errores" in metricas_seleccionadas:
+                try:
+                    st.write("Boxplot de errores")
+                    fig = plot_boxplot_errores(df_clean[TARGETS], results_df.values, TARGETS)
+                    st.pyplot(fig)
+                except Exception as e:
+                    st.info(f"No se pudo generar el boxplot: {e}")
+            # Dispersión real vs predicho
+            if "Dispersión real vs predicho" in metricas_seleccionadas:
+                try:
+                    st.write("Dispersión real vs predicho")
+                    fig = plot_dispersion(df_clean[TARGETS], results_df.values, TARGETS)
+                    st.pyplot(fig)
+                except Exception as e:
+                    st.info(f"No se pudo generar la dispersión: {e}")
+            # Barras de métricas
+            if "Barras de métricas" in metricas_seleccionadas:
+                try:
+                    st.write("Barras de métricas")
+                    # Construir dict de métricas para el batch actual
+                    metricas_batch = {}
+                    for i, var in enumerate(TARGETS):
+                        y_true = df_clean[var].values
+                        y_pred = results_df[var + "_Pred"].values
+                        mae = np.mean(np.abs(y_true - y_pred))
+                        mse = np.mean((y_true - y_pred)**2)
+                        rmse = np.sqrt(mse)
+                        mape = np.mean(np.abs((y_true - y_pred) / y_true))
+                        metricas_batch[var] = {"MAE": mae, "MSE": mse, "RMSE": rmse, "MAPE": mape}
+                    fig = plot_barras_metricas(metricas_batch, TARGETS)
+                    st.pyplot(fig)
+                except Exception as e:
+                    st.info(f"No se pudo generar las barras de métricas: {e}")
+            # Barras de R2
+            if "Barras de R2" in metricas_seleccionadas:
+                try:
+                    st.write("Barras de R2")
+                    # Calcular R2 para el batch actual
+                    metricas_batch = {}
+                    for i, var in enumerate(TARGETS):
+                        y_true = df_clean[var].values
+                        y_pred = results_df[var + "_Pred"].values
+                        r2 = 1 - np.sum((y_true - y_pred)**2) / np.sum((y_true - np.mean(y_true))**2)
+                        metricas_batch[var] = {"R2": r2}
+                    fig = plot_barras_r2(metricas_batch, TARGETS)
+                    st.pyplot(fig)
+                except Exception as e:
+                    st.info(f"No se pudo generar las barras de R2: {e}")
             # Mostrar curva de pérdida si existe la imagen
             if "Curva de pérdida (Loss)" in metricas_seleccionadas:
                 curva_path = os.path.join("modelos", "curva_loss.png")
