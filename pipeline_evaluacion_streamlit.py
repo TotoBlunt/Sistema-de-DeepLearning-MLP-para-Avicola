@@ -18,7 +18,7 @@ MODEL_PATH = "modelos/modelo_9vars_multisalida.keras"
 X_SCALER_PATH = "modelos/X_scaler_9vars.pkl"
 Y_SCALER_PATH = "modelos/y_scaler_4targets.pkl"
 LE_AREA_PATH = "modelos/label_encoder_tipo_area.pkl"
-METRICS_PATH = "modelos/metrics_9vars_multisalida.json"
+METRICS_PATH = "utils/metrics_9vars_multisalida.json"
 
 FEATURES = [
     'PorcMortSem4','PorcMortSem5', 'PorcMortSem6','PesoSem4', 'PesoSem5', 'Pob Inicial',
