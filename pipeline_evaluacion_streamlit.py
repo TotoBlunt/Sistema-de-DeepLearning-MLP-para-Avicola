@@ -138,20 +138,29 @@ if uploaded_file is not None:
     # =================== MÉTRICAS Y GRÁFICAS ===================
     st.markdown("---")
     st.subheader("Métricas y Gráficas de Validación")
-    # Mostrar métricas guardadas del entrenamiento
-    if metrics_dict and metricas_seleccionadas:
-        for met in metricas_seleccionadas:
-            if met in ["MAE", "MSE", "MAPE", "R2"]:
-                st.write(f"**{met} por variable:**")
-                for var in TARGETS:
-                    valor = metrics_dict[var].get(met, None)
-                    if valor is not None:
-                        st.write(f"{var}: {valor:.4f}")
-            # Puedes agregar aquí visualización de gráficas si tienes los datos/historial guardados
-        # Ejemplo: mostrar curva de pérdida si existe la imagen
-        if "Curva de pérdida (Loss)" in metricas_seleccionadas:
-            curva_path = os.path.join("modelos", "curva_loss.png")
-            if os.path.exists(curva_path):
-                st.image(curva_path, caption="Curva de pérdida (Loss)")
-            else:
-                st.info("No se encontró la curva de pérdida guardada.")
+    if metrics_dict:
+        if metricas_seleccionadas:
+            for met in metricas_seleccionadas:
+                if met in ["MAE", "MSE", "MAPE", "R2", "RMSE"]:
+                    st.write(f"**{met} por variable:**")
+                    for var in TARGETS:
+                        if met == "RMSE":
+                            mse_val = metrics_dict[var].get("MSE", None)
+                            if mse_val is not None:
+                                rmse_val = np.sqrt(mse_val)
+                                st.write(f"{var}: {rmse_val:.4f}")
+                        else:
+                            valor = metrics_dict[var].get(met, None)
+                            if valor is not None:
+                                st.write(f"{var}: {valor:.4f}")
+            # Mostrar curva de pérdida si existe la imagen
+            if "Curva de pérdida (Loss)" in metricas_seleccionadas:
+                curva_path = os.path.join("modelos", "curva_loss.png")
+                if os.path.exists(curva_path):
+                    st.image(curva_path, caption="Curva de pérdida (Loss)")
+                else:
+                    st.info("No se encontró la curva de pérdida guardada.")
+        else:
+            st.info("Selecciona al menos una métrica o gráfica en la barra lateral.")
+    else:
+        st.warning("No se encontraron métricas guardadas. Verifica que el archivo 'metrics_9vars_multisalida.json' exista y tenga datos.")
