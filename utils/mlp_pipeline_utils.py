@@ -334,7 +334,7 @@ def explic_loss():
     return mensaje
 
 def explic_plot_comparacion():
-    return """
+    mensaje = """
     # 📈 Evaluación Visual: Realidad vs. Predicción
 
 Esta gráfica, el **Gráfico de Dispersión Real vs. Predicho**, es la mejor manera de entender la **confiabilidad** de nuestro modelo de inteligencia artificial para sus lotes de pollos.
@@ -360,3 +360,4 @@ El mensaje del gráfico es que el modelo es **sumamente preciso** en los cuatro 
 
 **En resumen:** Nuestro modelo es una **herramienta de planificación altamente fiable**. Puede proyectar rendimientos y costos con **máxima confianza**, ya que la estimación de la IA iguala casi exactamente los resultados de la vida real. """
 
+    return mensaje
