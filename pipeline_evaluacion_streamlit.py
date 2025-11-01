@@ -284,21 +284,21 @@ else: # modo_prediccion == "Batch (archivo)"
             
             # Boxplot de errores
             if "Boxplot de errores" in metricas_seleccionadas:
-                try:
-                    st.write("Boxplot de Errores")
-                    fig = plot_boxplot_errores(y_true_df, y_pred_np, TARGETS)
-                    st.pyplot(fig.figure if hasattr(fig, 'figure') else fig)
-                except Exception as e:
-                    st.info(f"No se pudo generar el Boxplot de errores: {e}")
+                    try:
+                        st.write("Boxplot de Errores")
+                        fig = plot_boxplot_errores(y_true_df, y_pred_np, TARGETS)
+                        st.pyplot(fig)
+                    except Exception as e:
+                        st.info(f"No se pudo generar el Boxplot de errores: {e}")
                     
             # Dispersión real vs predicho
             if "Dispersión real vs predicho" in metricas_seleccionadas:
-                try:
-                    st.write("Gráfico de Dispersión Real vs Predicho")
-                    fig = plot_dispersion(y_true_df, y_pred_np, TARGETS)
-                    st.pyplot(fig.figure if hasattr(fig, 'figure') else fig)
-                except Exception as e:
-                    st.info(f"No se pudo generar el gráfico de Dispersión: {e}")
+                    try:
+                        st.write("Gráfico de Dispersión Real vs Predicho")
+                        fig = plot_dispersion(y_true_df, y_pred_np, TARGETS)
+                        st.pyplot(fig)
+                    except Exception as e:
+                        st.info(f"No se pudo generar el gráfico de Dispersión: {e}")
                     
             # Barras de métricas y R2 (Calculadas para el LOTE actual)
             if "Barras de métricas" in metricas_seleccionadas or "Barras de R2" in metricas_seleccionadas:
@@ -319,20 +319,20 @@ else: # modo_prediccion == "Batch (archivo)"
                     metricas_batch[var] = {"MAE": mae, "MSE": mse, "RMSE": rmse, "MAPE": mape, "R2": r2}
                     
                 if "Barras de métricas" in metricas_seleccionadas:
-                    try:
-                        st.write("Barras de Métricas (Lote Actual)")
-                        fig = plot_barras_metricas(metricas_batch, TARGETS)
-                        st.pyplot(fig.figure if hasattr(fig, 'figure') else fig)
-                    except Exception as e:
-                        st.info(f"No se pudo generar las barras de métricas: {e}")
+                        try:
+                            st.write("Barras de Métricas (Lote Actual)")
+                            fig = plot_barras_metricas(metricas_batch, TARGETS)
+                            st.pyplot(fig)
+                        except Exception as e:
+                            st.info(f"No se pudo generar las barras de métricas: {e}")
                         
                 if "Barras de R2" in metricas_seleccionadas:
-                    try:
-                        st.write("Barras de R2 (Lote Actual)")
-                        fig = plot_barras_r2(metricas_batch, TARGETS)
-                        st.pyplot(fig.figure if hasattr(fig, 'figure') else fig)
-                    except Exception as e:
-                        st.info(f"No se pudo generar las barras de R2: {e}")
+                        try:
+                            st.write("Barras de R2 (Lote Actual)")
+                            fig = plot_barras_r2(metricas_batch, TARGETS)
+                            st.pyplot(fig)
+                        except Exception as e:
+                            st.info(f"No se pudo generar las barras de R2: {e}")
             
             # Curva de pérdida (Solo si se encuentra la imagen guardada)
             if "Curva de pérdida (Loss)" in metricas_seleccionadas:
