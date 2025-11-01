@@ -45,14 +45,6 @@ def load_resources():
     return model, X_scaler, y_scaler, le_area, area_options, metrics_dict
 
 model, X_scaler, y_scaler, le_area, area_options, metrics_dict = load_resources()
-# DEBUG: Mostrar la ruta absoluta usada para cargar el archivo de métricas
-st.sidebar.write(f"DEBUG: Ruta de métricas usada: {METRICS_PATH}")
-# DEBUG: Mostrar si metrics_dict está cargado y su contenido
-st.sidebar.write("DEBUG: metrics_dict type:", type(metrics_dict))
-if metrics_dict:
-    st.sidebar.write("DEBUG: metrics_dict keys:", list(metrics_dict.keys()))
-else:
-    st.sidebar.write("DEBUG: metrics_dict is None or empty")
 
 # =================== INTERFAZ STREAMLIT ===================
 st.set_page_config(
