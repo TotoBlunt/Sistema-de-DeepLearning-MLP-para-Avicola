@@ -70,3 +70,4 @@ wheel==0.45.1
 wrapt==1.17.3
 matplotlib
 seaborn
+shap

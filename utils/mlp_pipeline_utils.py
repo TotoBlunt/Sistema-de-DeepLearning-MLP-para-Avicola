@@ -17,6 +17,8 @@ from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 import joblib
 import json
 import matplotlib.pyplot as plt
+import shap
+from matplotlib.figure import Figure
 
 FEATURES = [
     'PorcMortSem4','PorcMortSem5', 'PorcMortSem6','PesoSem4', 'PesoSem5', 'Pob Inicial',
@@ -184,8 +186,6 @@ def plot_barras_r2(metricas, nombres):
     ax.grid(True, linestyle="--", alpha=0.4)
     fig.tight_layout()
     return fig
-
-
 
 
 def plot_barras_metricas(metricas, nombres):
@@ -418,4 +418,62 @@ El mensaje clave es que el error es **mínimo** en las métricas de eficiencia p
 **En resumen:** Las métricas críticas de **eficiencia (ICA y Peso)** tienen errores prácticamente nulos, dándole la máxima confianza en la planificación del rendimiento y el costo. La **mortalidad**, aunque más variable, sigue siendo manejable y predecible en términos relativos, lo que es vital para la gestión de riesgos en la producción avícola. """
     return mensaje
 
+
+def plot_shap_summary(model, X_scaled, X_df_features, features, target_name):
+    """
+    Genera el gráfico SHAP Summary Plot para la interpretabilidad global del modelo.
     
+    Args:
+        model (keras.Model): Modelo MLP cargado.
+        X_scaled (np.ndarray): Los datos de entrada escalados (solo features).
+        X_df_features (pd.DataFrame): DataFrame de los datos de entrada sin escalar.
+        features (list): Lista de nombres de las variables de entrada.
+        target_name (str): Nombre del target (para el título).
+        
+    Returns:
+        matplotlib.figure.Figure: Objeto Matplotlib Figure.
+    """
+    
+    # 1. Muestreo para Background (Acelera el KernelExplainer)
+    # Seleccionamos una muestra pequeña (e.g., 100) para el background
+    X_background = shap.utils.sample(X_scaled, 100)
+    
+    # 2. Inicializar Explainer (Compatible con Keras)
+    # Usamos model.predict como la función a explicar
+    explainer = shap.KernelExplainer(model.predict, X_background)
+
+    # 3. Muestreo para Explicación (Para el cálculo de SHAP)
+    # Calculamos SHAP para una muestra de los datos cargados (máx 500 para evitar lentitud excesiva en Streamlit)
+    N_explain = min(500, X_scaled.shape[0])
+    X_explain = shap.utils.sample(X_scaled, N_explain) 
+    
+    # Obtener el índice del target basado en el nombre (asumimos que 'target_name' es el primer TARGET, Peso Prom. Final)
+    # Nota: Si tu modelo Keras devuelve 4 outputs, shap_values será una lista de 4 arrays.
+    
+    # Buscamos qué output explica mejor (podrías tener que ajustar este índice)
+    # Por ahora, SHAP se centra en el primer target para el Summary Plot global.
+    shap_target_index = 0
+    
+    # 4. Cálculo de Valores SHAP
+    # El cálculo de SHAP puede ser lento.
+    shap_values = explainer.shap_values(X_explain, check_additivity=False)
+    
+    # 5. Generar Gráfico de Resumen
+    fig_summary = plt.figure(figsize=(8, 6), dpi=100)
+    
+    # Muestreamos el DataFrame original para las etiquetas de color
+    # Necesitamos el DataFrame no escalado para que los colores se muestren correctamente
+    X_df_explain = X_df_features.iloc[X_explain.index] if hasattr(X_explain, 'index') else X_df_features.head(N_explain)
+
+    # SHAP Summary Plot
+    shap.summary_plot(
+        shap_values[shap_target_index], # Usamos el primer target (Índice 0)
+        X_df_explain,
+        show=False, # Importante: no mostrar, solo dibujar en la figura
+        plot_type="dot"
+    )
+    plt.title(f"Impacto de Variables (SHAP) en: {target_name}", fontsize=14)
+    plt.tight_layout()
+    
+    # Es crucial que la figura sea cerrada *después* de st.pyplot, pero retornamos la figura.
+    return fig_summary
