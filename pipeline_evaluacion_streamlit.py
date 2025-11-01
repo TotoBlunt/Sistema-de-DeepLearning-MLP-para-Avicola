@@ -1,4 +1,3 @@
-
 """
 pipeline_evaluacion_streamlit.py
 App Streamlit para evaluar el modelo MLP multisalida, mostrar métricas y gráficas interactivas.
@@ -11,6 +10,10 @@ import os
 import json
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
+from tensorflow.keras.models import load_model # Importación necesaria aquí para evitar NameError en load_resources
+
+# Asume que estas funciones están en utils/mlp_pipeline_utils.py
+# Si no lo están, asegúrate de que existen o define las funciones
 from utils.mlp_pipeline_utils import plot_boxplot_errores, plot_dispersion, plot_barras_metricas, plot_barras_r2
 
 # =================== CONFIGURACIÓN Y CARGA DE RECURSOS ===================
@@ -29,22 +32,58 @@ TARGETS = ['Peso Prom. Final', 'Porc Consumo', 'ICA', 'Por_Mort._Final']
 
 @st.cache_resource
 def load_resources():
-    from tensorflow.keras.models import load_model
-    model = load_model(MODEL_PATH)
-    X_scaler = joblib.load(X_SCALER_PATH)
-    y_scaler = joblib.load(Y_SCALER_PATH)
-    le_area = None
-    area_options = None
-    if os.path.exists(LE_AREA_PATH):
-        le_area = joblib.load(LE_AREA_PATH)
-        area_options = le_area.classes_
-    metrics_dict = None
-    if os.path.exists(METRICS_PATH):
-        with open(METRICS_PATH, "r") as f:
-            metrics_dict = json.load(f)
-    return model, X_scaler, y_scaler, le_area, area_options, metrics_dict
+    # Asegurarse de que TensorFlow esté cargado antes de load_model
+    import tensorflow as tf
+    try:
+        model = load_model(MODEL_PATH)
+        X_scaler = joblib.load(X_SCALER_PATH)
+        y_scaler = joblib.load(Y_SCALER_PATH)
+        le_area = None
+        area_options = None
+        if os.path.exists(LE_AREA_PATH):
+            le_area = joblib.load(LE_AREA_PATH)
+            area_options = le_area.classes_
+        metrics_dict = None
+        if os.path.exists(METRICS_PATH):
+            with open(METRICS_PATH, "r") as f:
+                metrics_dict = json.load(f)
+        return model, X_scaler, y_scaler, le_area, area_options, metrics_dict
+    except Exception as e:
+        st.error(f"Error al cargar recursos esenciales: {e}. Verifique las rutas de los archivos.")
+        return None, None, None, None, None, None
 
 model, X_scaler, y_scaler, le_area, area_options, metrics_dict = load_resources()
+
+if model is None:
+    st.stop() # Detener si no se cargan los recursos
+
+# =================== FUNCIONES DE PROCESAMIENTO Y PREDICCIÓN ===================
+def clean_data(df, le_area=None):
+    """Limpia y codifica los datos de entrada."""
+    df = df.copy()
+    # Solo trabajamos con las features que el modelo necesita
+    df_features_targets = df[[col for col in FEATURES + TARGETS if col in df.columns]].copy()
+    df_features_targets = df_features_targets.dropna(subset=FEATURES)
+    
+    if 'Area' in FEATURES and le_area is not None and 'Area' in df_features_targets.columns:
+        try:
+            # La columna 'Area' debe ser string antes de la transformación
+            df_features_targets['Area'] = le_area.transform(df_features_targets['Area'].astype(str))
+        except ValueError:
+            st.warning("Advertencia: Se encontraron categorías de 'Area' no vistas durante el entrenamiento. Los datos no codificables serán omitidos.")
+            # Si esto ocurre, podrías necesitar una estrategia más robusta (ej. imputación, o saltar la fila)
+            pass
+            
+    return df_features_targets
+
+def predict_batch(df_features, model, X_scaler, y_scaler):
+    """Realiza la predicción y deshace el escalado."""
+    X_input_scaled = X_scaler.transform(df_features[FEATURES])
+    y_pred_scaled = model.predict(X_input_scaled, verbose=0)
+    y_pred_original = y_scaler.inverse_transform(y_pred_scaled)
+    # Nombres de las columnas predichas
+    results_df = pd.DataFrame(y_pred_original, columns=[f"{t}_Pred" for t in TARGETS])
+    return results_df
 
 # =================== INTERFAZ STREAMLIT ===================
 st.set_page_config(
@@ -57,8 +96,6 @@ st.markdown("---")
 st.markdown("Sube tu archivo, escoge métricas y gráficas, y evalúa el modelo de forma interactiva.")
 
 # Sidebar para selección de métricas y gráficas
-
-# Nuevo: Selector de modo de predicción
 st.sidebar.header("Modo de predicción")
 modo_prediccion = st.sidebar.radio("Selecciona el modo de predicción:", ["Manual", "Batch (archivo)"])
 
@@ -82,43 +119,86 @@ if modo == "cluster":
 if modo == "ranking":
     rank_by = st.sidebar.selectbox("Columna para ranking", [f"{t}_Pred" for t in TARGETS])
 
-# =================== CARGA DE ARCHIVO ===================
-
-uploaded_file = None
-# =================== ENTRADA DE DATOS ===================
+# =================== LÓGICA PRINCIPAL ===================
 df_clean = None
 results_df = None
 df_out = None
+uploaded_file = None # Inicializamos para evitar NameError
 
 if modo_prediccion == "Manual":
     st.subheader("Predicción manual de variables")
     manual_inputs = {}
-    for feat in FEATURES:
-        if feat == "Area" and area_options is not None:
-            manual_inputs[feat] = st.selectbox(f"{feat}", area_options)
-        else:
-            manual_inputs[feat] = st.number_input(f"{feat}", value=0.0, format="%0.4f")
-    if st.button("Predecir manualmente"):
+    
+    # Formulario para entrada de Features
+    with st.form("manual_input_form"):
+        st.markdown("#### Variables de Entrada (Features)")
+        cols_f = st.columns(3)
+        for i, feat in enumerate(FEATURES):
+            col_index = i % 3
+            if feat == "Area" and area_options is not None:
+                with cols_f[col_index]:
+                    manual_inputs[feat] = st.selectbox(f"**{feat}**", area_options, key=f"man_f_{feat}")
+            else:
+                with cols_f[col_index]:
+                    manual_inputs[feat] = st.number_input(f"**{feat}**", value=0.0, format="%0.4f", key=f"man_f_{feat}")
+
+        # Formulario para entrada de Targets Reales (Opcional, para métricas)
+        st.markdown("---")
+        st.markdown("#### Valores Reales (Targets - Opcional para métricas)")
+        st.info("Ingrese los valores reales si desea calcular el error para este punto de dato.")
+        cols_t = st.columns(4)
+        y_true_inputs = {}
+        for i, target in enumerate(TARGETS):
+            with cols_t[i]:
+                # Usamos None o 0.0, pero None es mejor para saber si fue llenado
+                y_true_inputs[target] = st.number_input(f"**{target}** (Real)", value=None, format="%0.4f", key=f"man_t_{target}")
+
+        submitted = st.form_submit_button("🚀 Predecir y Evaluar", type="primary")
+
+    if submitted:
         # Construir DataFrame de una sola fila
         df_manual = pd.DataFrame([manual_inputs])
-        # Codificar Area si es necesario
-        if "Area" in FEATURES and le_area is not None:
-            df_manual["Area"] = le_area.transform([df_manual["Area"].iloc[0]])
-        df_clean = df_manual
-        results_df = predict_batch(df_clean, model, X_scaler, y_scaler)
-        df_out = pd.concat([df_clean.reset_index(drop=True), results_df], axis=1)
+        
+        # Codificar Area (si existe) y limpiar
+        df_clean_manual = clean_data(df_manual, le_area)
+        
+        # Predicción
+        results_df = predict_batch(df_clean_manual, model, X_scaler, y_scaler)
+        
+        # Concatenar resultados
+        df_out = pd.concat([df_manual.reset_index(drop=True), results_df], axis=1)
         st.success("✅ Predicción manual completada")
+        
+        st.subheader("Resultados Predichos")
         st.dataframe(df_out)
-        # Mostrar métricas no aplica aquí (solo batch), pero mostrar resultados
-        st.write("Resultados predichos:")
-        for i, var in enumerate(TARGETS):
-            st.write(f"{var}: {results_df.iloc[0, i]:.4f}")
-else:
+        
+        # Evaluación de métricas (solo si se ingresaron todos los valores reales)
+        y_true_values = {k: v for k, v in y_true_inputs.items() if v is not None}
+        if len(y_true_values) == len(TARGETS):
+            st.markdown("---")
+            st.subheader("Métricas de Error para esta Instancia")
+            
+            y_true_array = np.array([list(y_true_values.values())])
+            y_pred_array = results_df.values
+            
+            st.write(f"Error Absoluto Medio (MAE): {np.mean(np.abs(y_true_array - y_pred_array)):.4f}")
+            # Puedes expandir esto para mostrar métricas individuales si lo deseas.
+        elif len(y_true_values) > 0:
+            st.info("Para ver las métricas de error para este punto, complete todos los valores reales.")
+        
+
+
+# =================== MODO BATCH (ARCHIVO) - Lógica Consolidada ===================
+else: # modo_prediccion == "Batch (archivo)"
+    st.subheader("Carga de Archivo para Evaluación en Lote")
+    st.info(f"💡 Para calcular las **métricas y gráficas de validación** debe incluir las columnas {TARGETS} (valores reales) en el archivo.")
+    
     uploaded_file = st.file_uploader(
         "Sube tu archivo Excel (.xlsx) o CSV (.csv) con las variables de entrada.",
         type=["xlsx", "csv", "xlsm"],
         key="file_uploader_eval"
     )
+    
     if uploaded_file is not None:
         try:
             if uploaded_file.name.endswith('.csv'):
@@ -129,17 +209,23 @@ else:
             st.error(f"Error al leer el archivo: {e}")
             st.stop()
 
-        missing_cols = [f for f in FEATURES if f not in df.columns]
-        if missing_cols:
-            st.error(f"Faltan las siguientes columnas en el archivo: {missing_cols}")
+        missing_features = [f for f in FEATURES if f not in df.columns]
+        if missing_features:
+            st.error(f"❌ Faltan las siguientes columnas de **entrada (FEATURES)** en el archivo: {missing_features}")
             st.stop()
-
+        
+        # 1. Limpieza y preparación (también preserva TARGETS si existen)
         df_clean = clean_data(df, le_area)
+        
+        # 2. Predicción
         results_df = predict_batch(df_clean, model, X_scaler, y_scaler)
+        
+        # 3. Concatenación de resultados (preserva FEATURES y TARGETS originales/limpios)
         df_out = pd.concat([df_clean.reset_index(drop=True), results_df], axis=1)
 
+        # 4. Modo de evaluación (Clustering / Ranking)
         if modo == "cluster":
-            kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+            kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init='auto')
             clusters = kmeans.fit_predict(results_df)
             df_out['Cluster'] = clusters
 
@@ -148,7 +234,7 @@ else:
             df_out['Ranking'] = np.arange(1, len(df_out)+1)
 
         st.success("✅ Evaluación completada")
-        st.subheader("Resultados (primeros 10 registros)")
+        st.subheader("Resultados de la Evaluación (primeros 10 registros)")
         st.dataframe(df_out.head(10))
         csv = df_out.to_csv(index=False).encode('utf-8')
         st.download_button(
@@ -157,141 +243,110 @@ else:
             file_name="resultados_evaluacion.csv",
             mime="text/csv"
         )
+        
+        # =================== MÉTRICAS Y GRÁFICAS (Validación con datos reales) ===================
+        st.markdown("---")
+        st.subheader("Métricas y Gráficas de Validación")
+        
+        # Verificar si las columnas TARGETS reales existen en el archivo cargado
+        y_true_available = all(t in df_clean.columns for t in TARGETS)
+        
+        if y_true_available:
+            
+            # DataFrame de valores reales para la comparación
+            y_true_df = df_clean[TARGETS]
+            y_pred_np = results_df.values
+            
+            # Mostrar Métricas Fijas (del archivo JSON guardado)
+            if metrics_dict:
+                st.markdown("#### Métricas Generales del Modelo (Datos de Entrenamiento/Validación Guardados)")
+                
+                # Mostrar métricas seleccionadas
+                for met in metricas_seleccionadas:
+                    if met in ["MAE", "MSE", "MAPE", "R2", "RMSE"]:
+                        st.markdown(f"**{met} (Modelo Entrenado):**")
+                        cols_met = st.columns(4)
+                        for i, var in enumerate(TARGETS):
+                            with cols_met[i]:
+                                if met == "RMSE":
+                                    mse_val = metrics_dict.get(var, {}).get("MSE", None)
+                                    valor = np.sqrt(mse_val) if mse_val is not None else None
+                                else:
+                                    valor = metrics_dict.get(var, {}).get(met, None)
+                                
+                                if valor is not None:
+                                    st.metric(label=var, value=f"{valor:.4f}")
+                                else:
+                                    st.metric(label=var, value="N/A")
 
-
-
-# =================== FUNCIONES DE PROCESAMIENTO Y PREDICCIÓN ===================
-def clean_data(df, le_area=None):
-    df = df.copy()
-    df = df.dropna(subset=FEATURES)
-    if 'Area' in FEATURES and le_area is not None and 'Area' in df.columns:
-        df['Area'] = le_area.transform(df['Area'])
-    return df
-
-def predict_batch(df, model, X_scaler, y_scaler):
-    X_input_scaled = X_scaler.transform(df[FEATURES])
-    y_pred_scaled = model.predict(X_input_scaled, verbose=0)
-    y_pred_original = y_scaler.inverse_transform(y_pred_scaled)
-    results_df = pd.DataFrame(y_pred_original, columns=[f"{t}_Pred" for t in TARGETS])
-    return results_df
-
-if uploaded_file is not None:
-    try:
-        if uploaded_file.name.endswith('.csv'):
-            df = pd.read_csv(uploaded_file)
-        else:
-            df = pd.read_excel(uploaded_file)
-    except Exception as e:
-        st.error(f"Error al leer el archivo: {e}")
-        st.stop()
-
-    missing_cols = [f for f in FEATURES if f not in df.columns]
-    if missing_cols:
-        st.error(f"Faltan las siguientes columnas en el archivo: {missing_cols}")
-        st.stop()
-
-    df_clean = clean_data(df, le_area)
-    results_df = predict_batch(df_clean, model, X_scaler, y_scaler)
-    df_out = pd.concat([df_clean.reset_index(drop=True), results_df], axis=1)
-
-    if modo == "cluster":
-        kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-        clusters = kmeans.fit_predict(results_df)
-        df_out['Cluster'] = clusters
-
-    if modo == "ranking":
-        df_out = df_out.sort_values(by=rank_by, ascending=False)
-        df_out['Ranking'] = np.arange(1, len(df_out)+1)
-
-    st.success("✅ Evaluación completada")
-    st.subheader("Resultados (primeros 10 registros)")
-    st.dataframe(df_out.head(10))
-    csv = df_out.to_csv(index=False).encode('utf-8')
-    st.download_button(
-        label="⬇️ Descargar resultados en CSV",
-        data=csv,
-        file_name="resultados_evaluacion.csv",
-        mime="text/csv"
-    )
-
-    # =================== MÉTRICAS Y GRÁFICAS ===================
-    st.markdown("---")
-    st.subheader("Métricas y Gráficas de Validación")
-    if metrics_dict:
-        if metricas_seleccionadas:
-            for met in metricas_seleccionadas:
-                if met in ["MAE", "MSE", "MAPE", "R2", "RMSE"]:
-                    st.write(f"**{met} por variable:**")
-                    for var in TARGETS:
-                        if met == "RMSE":
-                            mse_val = metrics_dict[var].get("MSE", None)
-                            if mse_val is not None:
-                                rmse_val = np.sqrt(mse_val)
-                                st.write(f"{var}: {rmse_val:.4f}")
-                        else:
-                            valor = metrics_dict[var].get(met, None)
-                            if valor is not None:
-                                st.write(f"{var}: {valor:.4f}")
-
-            # Mostrar gráficos generados en tiempo real si hay datos suficientes
-            # Usamos los datos actuales del usuario para los gráficos
+            # Gráficas generadas en tiempo real (requieren y_true_df)
+            st.markdown("#### Evaluación Gráfica del Lote Actual")
+            
             # Boxplot de errores
             if "Boxplot de errores" in metricas_seleccionadas:
                 try:
-                    st.write("Boxplot de errores")
-                    fig = plot_boxplot_errores(df_clean[TARGETS], results_df.values, TARGETS)
+                    st.write("Boxplot de Errores")
+                    fig = plot_boxplot_errores(y_true_df, y_pred_np, TARGETS)
                     st.pyplot(fig.figure if hasattr(fig, 'figure') else fig)
                 except Exception as e:
-                    st.info(f"No se pudo generar el boxplot: {e}")
+                    st.info(f"No se pudo generar el Boxplot de errores: {e}")
+                    
             # Dispersión real vs predicho
             if "Dispersión real vs predicho" in metricas_seleccionadas:
                 try:
-                    st.write("Dispersión real vs predicho")
-                    fig = plot_dispersion(df_clean[TARGETS], results_df.values, TARGETS)
+                    st.write("Gráfico de Dispersión Real vs Predicho")
+                    fig = plot_dispersion(y_true_df, y_pred_np, TARGETS)
                     st.pyplot(fig.figure if hasattr(fig, 'figure') else fig)
                 except Exception as e:
-                    st.info(f"No se pudo generar la dispersión: {e}")
-            # Barras de métricas
-            if "Barras de métricas" in metricas_seleccionadas:
-                try:
-                    st.write("Barras de métricas")
-                    # Construir dict de métricas para el batch actual
-                    metricas_batch = {}
-                    for i, var in enumerate(TARGETS):
-                        y_true = df_clean[var].values
-                        y_pred = results_df[var + "_Pred"].values
-                        mae = np.mean(np.abs(y_true - y_pred))
-                        mse = np.mean((y_true - y_pred)**2)
-                        rmse = np.sqrt(mse)
-                        mape = np.mean(np.abs((y_true - y_pred) / y_true))
-                        metricas_batch[var] = {"MAE": mae, "MSE": mse, "RMSE": rmse, "MAPE": mape}
-                    fig = plot_barras_metricas(metricas_batch, TARGETS)
-                    st.pyplot(fig.figure if hasattr(fig, 'figure') else fig)
-                except Exception as e:
-                    st.info(f"No se pudo generar las barras de métricas: {e}")
-            # Barras de R2
-            if "Barras de R2" in metricas_seleccionadas:
-                try:
-                    st.write("Barras de R2")
-                    # Calcular R2 para el batch actual
-                    metricas_batch = {}
-                    for i, var in enumerate(TARGETS):
-                        y_true = df_clean[var].values
-                        y_pred = results_df[var + "_Pred"].values
-                        r2 = 1 - np.sum((y_true - y_pred)**2) / np.sum((y_true - np.mean(y_true))**2)
-                        metricas_batch[var] = {"R2": r2}
-                    fig = plot_barras_r2(metricas_batch, TARGETS)
-                    st.pyplot(fig.figure if hasattr(fig, 'figure') else fig)
-                except Exception as e:
-                    st.info(f"No se pudo generar las barras de R2: {e}")
-            # Mostrar curva de pérdida si existe la imagen
+                    st.info(f"No se pudo generar el gráfico de Dispersión: {e}")
+                    
+            # Barras de métricas y R2 (Calculadas para el LOTE actual)
+            if "Barras de métricas" in metricas_seleccionadas or "Barras de R2" in metricas_seleccionadas:
+                metricas_batch = {}
+                for i, var in enumerate(TARGETS):
+                    y_true = y_true_df[var].values
+                    y_pred = results_df[var + "_Pred"].values
+                    
+                    mae = np.mean(np.abs(y_true - y_pred))
+                    mse = np.mean((y_true - y_pred)**2)
+                    rmse = np.sqrt(mse)
+                    # Evitar división por cero en MAPE y R2 si la varianza es cero
+                    mape = np.mean(np.abs((y_true - y_pred) / y_true)) if np.all(y_true != 0) else 0 
+                    
+                    var_y = np.sum((y_true - np.mean(y_true))**2)
+                    r2 = 1 - np.sum((y_true - y_pred)**2) / var_y if var_y != 0 else 0
+                    
+                    metricas_batch[var] = {"MAE": mae, "MSE": mse, "RMSE": rmse, "MAPE": mape, "R2": r2}
+                    
+                if "Barras de métricas" in metricas_seleccionadas:
+                    try:
+                        st.write("Barras de Métricas (Lote Actual)")
+                        fig = plot_barras_metricas(metricas_batch, TARGETS)
+                        st.pyplot(fig.figure if hasattr(fig, 'figure') else fig)
+                    except Exception as e:
+                        st.info(f"No se pudo generar las barras de métricas: {e}")
+                        
+                if "Barras de R2" in metricas_seleccionadas:
+                    try:
+                        st.write("Barras de R2 (Lote Actual)")
+                        fig = plot_barras_r2(metricas_batch, TARGETS)
+                        st.pyplot(fig.figure if hasattr(fig, 'figure') else fig)
+                    except Exception as e:
+                        st.info(f"No se pudo generar las barras de R2: {e}")
+            
+            # Curva de pérdida (Solo si se encuentra la imagen guardada)
             if "Curva de pérdida (Loss)" in metricas_seleccionadas:
-                curva_path = os.path.join("modelos", "curva_loss.png")
+                curva_path = os.path.join(BASE_DIR, "modelos", "curva_loss.png")
                 if os.path.exists(curva_path):
                     st.image(curva_path, caption="Curva de pérdida (Loss)")
                 else:
                     st.info("No se encontró la curva de pérdida guardada.")
+                    
         else:
-            st.info("Selecciona al menos una métrica o gráfica en la barra lateral.")
-    else:
-        st.warning("No se encontraron métricas guardadas. Verifica que el archivo 'metrics_9vars_multisalida.json' exista y tenga datos.")
+            st.warning(f"⚠️ **Métricas Omitidas:** Para generar los Boxplots, Dispersión y calcular el R2 del lote actual, el archivo subido debe contener las columnas de **valores reales** ({TARGETS}).")
+
+        
+    else: # Si el archivo no se ha subido
+        st.info("A la espera de la carga del archivo.")
+
+
