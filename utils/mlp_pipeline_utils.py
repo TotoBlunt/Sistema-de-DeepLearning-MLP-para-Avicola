@@ -339,8 +339,6 @@ def explic_plot_comparacion():
 
 Esta gráfica, el **Gráfico de Dispersión Real vs. Predicho**, es la mejor manera de entender la **confiabilidad** de nuestro modelo de inteligencia artificial para sus lotes de pollos.
 
----
-
 ### ¿Qué Estamos Viendo?
 
 Imagine la línea roja punteada (diagonal) como el camino de la **predicción perfecta**. Cada punto que cae sobre esta línea significa: **Modelo predijo = Resultado Real en Granja.**
@@ -348,8 +346,6 @@ Imagine la línea roja punteada (diagonal) como el camino de la **predicción pe
 * **Puntos Azules (Lotes de Producción):** Representan el resultado de cada lote que hemos analizado.
     * **Eje Horizontal:** El valor que **realmente** obtuvimos (el resultado real).
     * **Eje Vertical:** El valor que el **modelo predijo** (la estimación de la IA).
-
----
 
 ### Conclusión Crucial para el Negocio
 
@@ -368,8 +364,6 @@ def explic_plot_boxplot_errores():
 
 Este gráfico, llamado **Boxplot de Errores**, nos dice de manera precisa cuánto se equivoca nuestro modelo en cada predicción.
 
----
-
 ### ¿Cómo se lee esta "Caja"?
 
 * **Eje Vertical (Error):** Muestra la diferencia. Si el error es **cero (la línea gruesa central)**, significa que la predicción fue **perfecta**.
@@ -377,8 +371,6 @@ Este gráfico, llamado **Boxplot de Errores**, nos dice de manera precisa cuánt
 * **La Caja (Box):** Muestra dónde se encuentra el **50% de todos nuestros errores**. Si la caja es pequeña y está cerca de cero, la predicción es muy estable.
 * **Las Líneas Finitas (Bigotes):** Muestran el rango total de errores, incluyendo el 99% de las predicciones.
 * **Los Círculos (Outliers):** Son errores ocasionales, atípicos o muy grandes.
-
----
 
 ### 🔎 Análisis de las Variables
 
@@ -401,8 +393,6 @@ def explic_metricas_error():
 
 Este gráfico compara las **magnitudes del error** de nuestro modelo para el **Lote Actual**, permitiéndonos ver rápidamente dónde somos más precisos.
 
----
-
 ### ¿Cómo se Interpreta el Gráfico?
 
 * **Eje Vertical (Valor - escala log):** Muestra el tamaño del error. Cuanto **más baja** es una barra, **mejor es la predicción**.
@@ -412,8 +402,6 @@ Este gráfico compara las **magnitudes del error** de nuestro modelo para el **L
     * **RMSE (Verde):** Similar al MAE, pero penaliza más los errores grandes (el mejor indicador del error general).
     * **MAPE (Rojo):** Error promedio expresado como **porcentaje** del valor real (la métrica más fácil de entender).
     * **MSE (Naranja):** Error cuadrático medio (base del RMSE, pero menos intuitivo).
-
----
 
 ### 🔎 Conclusiones Críticas
 
