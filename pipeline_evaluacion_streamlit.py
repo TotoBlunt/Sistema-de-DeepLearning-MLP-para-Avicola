@@ -14,7 +14,7 @@ from tensorflow.keras.models import load_model # Importación necesaria aquí pa
 
 # Asume que estas funciones están en utils/mlp_pipeline_utils.py
 # Si no lo están, asegúrate de que existen o define las funciones
-from utils.mlp_pipeline_utils import plot_boxplot_errores, plot_dispersion, plot_barras_metricas, plot_barras_r2,explicacion_metricas,explic_loss, explic_plot_comparacion
+from utils.mlp_pipeline_utils import plot_boxplot_errores, plot_dispersion, plot_barras_metricas, plot_barras_r2,explicacion_metricas,explic_loss, explic_plot_comparacion, explic_plot_boxplot_errores,explic_metricas_error
 
 # =================== CONFIGURACIÓN Y CARGA DE RECURSOS ===================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -97,11 +97,11 @@ st.markdown("Sube tu archivo, escoge métricas y gráficas, y evalúa el modelo 
 
 # Sidebar para selección de métricas y gráficas
 st.sidebar.header("Modo de predicción")
-modo_prediccion = st.sidebar.radio("Selecciona el modo de predicción:", ["Manual", "Batch (archivo)"])
+modo_prediccion = st.sidebar.radio("Selecciona el modo de predicción:", ["Manual", "Automatizado (Batch - archivo)"])
 
 st.sidebar.header("Visualización de Métricas y Gráficas")
 metricas_opciones = [
-    "MAE", "MSE", "RMSE", "MAPE", "R2", "Boxplot de errores", "Dispersión real vs predicho", "Barras de métricas", "Barras de R2", "Curva de pérdida (Loss)"
+    "MAE", "MSE", "RMSE", "MAPE", "R2", "Boxplot de errores", "Dispersión real vs predicho", "Barras de métricas",  "Curva de pérdida (Loss)"
 ]
 metricas_seleccionadas = st.sidebar.multiselect(
     "Selecciona las métricas y gráficas a mostrar:",
@@ -318,6 +318,8 @@ else: # modo_prediccion == "Batch (archivo)"
                         fig = plot_boxplot_errores(y_true_df, y_pred_np, TARGETS)
                         st.pyplot(fig)
                         plt.close('all')
+                        explicacion = explic_plot_boxplot_errores()
+                        st.markdown(explicacion)
                     except Exception as e:
                         st.info(f"No se pudo generar el Boxplot de errores: {e}")
                     
@@ -332,9 +334,8 @@ else: # modo_prediccion == "Batch (archivo)"
                         st.markdown(explicacion)
                     except Exception as e:
                         st.info(f"No se pudo generar el gráfico de Dispersión: {e}")
-                    
-            # Barras de métricas y R2 (Calculadas para el LOTE actual)
-            if "Barras de métricas" in metricas_seleccionadas or "Barras de R2" in metricas_seleccionadas:
+            # Barras de métricas (Calculadas para el LOTE actual)
+            if "Barras de métricas" in metricas_seleccionadas:
                 metricas_batch = {}
                 for i, var in enumerate(TARGETS):
                     y_true = y_true_df[var].values
@@ -357,17 +358,11 @@ else: # modo_prediccion == "Batch (archivo)"
                             fig = plot_barras_metricas(metricas_batch, TARGETS)
                             st.pyplot(fig)
                             plt.close('all')
+                            explicacion = explic_metricas_error()
+                            st.markdown(explicacion)
                         except Exception as e:
                             st.info(f"No se pudo generar las barras de métricas: {e}")
                         
-                if "Barras de R2" in metricas_seleccionadas:
-                        try:
-                            st.write("Barras de R2 (Lote Actual)")
-                            fig = plot_barras_r2(metricas_batch, TARGETS)
-                            st.pyplot(fig)
-                            plt.close('all')
-                        except Exception as e:
-                            st.info(f"No se pudo generar las barras de R2: {e}")
             
             # Curva de pérdida (Solo si se encuentra la imagen guardada)
             if "Curva de pérdida (Loss)" in metricas_seleccionadas:

@@ -361,3 +361,73 @@ El mensaje del gráfico es que el modelo es **sumamente preciso** en los cuatro 
 **En resumen:** Nuestro modelo es una **herramienta de planificación altamente fiable**. Puede proyectar rendimientos y costos con **máxima confianza**, ya que la estimación de la IA iguala casi exactamente los resultados de la vida real. """
 
     return mensaje
+
+def explic_plot_boxplot_errores():
+    mensaje = """
+    # 📦 Evaluación de Errores: ¿Qué tan lejos estamos de la realidad?
+
+Este gráfico, llamado **Boxplot de Errores**, nos dice de manera precisa cuánto se equivoca nuestro modelo en cada predicción.
+
+---
+
+### ¿Cómo se lee esta "Caja"?
+
+* **Eje Vertical (Error):** Muestra la diferencia. Si el error es **cero (la línea gruesa central)**, significa que la predicción fue **perfecta**.
+* **La Línea Gruesa dentro de la Caja:** Es el **error promedio**. Buscamos que esta línea esté lo más cerca posible de cero.
+* **La Caja (Box):** Muestra dónde se encuentra el **50% de todos nuestros errores**. Si la caja es pequeña y está cerca de cero, la predicción es muy estable.
+* **Las Líneas Finitas (Bigotes):** Muestran el rango total de errores, incluyendo el 99% de las predicciones.
+* **Los Círculos (Outliers):** Son errores ocasionales, atípicos o muy grandes.
+
+---
+
+### 🔎 Análisis de las Variables
+
+El mensaje principal es de **altísima confianza** en las métricas de rendimiento y eficiencia:
+
+1.  **Peso Prom. Final, Porc Consumo, e ICA:**
+    * Sus cajas son **extremadamente delgadas** y la línea central de error está **prácticamente en cero**.
+    * **Esto significa que el modelo es increíblemente estable y preciso.** El 50% de las veces, el error es casi indetectable. Las predicciones de peso y eficiencia alimenticia (ICA) tienen un margen de error insignificante.
+
+2.  **Por_Mort._Final (Porcentaje de Mortalidad Final):**
+    * Aunque la caja es mucho más ancha, la línea de error promedio **(la línea verde)** sigue estando **muy cerca de cero**.
+    * La mayor dispersión (caja ancha y bigotes largos) es **normal** en esta variable. Esto se debe a que la mortalidad es más sensible a eventos no medidos (enfermedades, clima extremo), haciendo que el modelo se equivoque más que en el ICA, pero aun así, **el error promedio general es bajo**. Los círculos grandes son los lotes con mortalidad atípica (alta o baja).
+
+**En resumen:** Para las métricas de **eficiencia y crecimiento (Peso, Consumo, ICA)**, el modelo es **sólido como una roca**. El error es casi nulo, lo cual es excelente para su planificación. Para la **mortalidad**, aunque hay más variabilidad, el modelo sigue siendo **confiable en promedio**, lo que es crucial para la gestión de riesgos en la producción avícola. """
+    return mensaje
+
+def explic_metricas_error():
+    mensaje = """
+    # 📊 Barras de Error: La Magnitud de la Precisión
+
+Este gráfico compara las **magnitudes del error** de nuestro modelo para el **Lote Actual**, permitiéndonos ver rápidamente dónde somos más precisos.
+
+---
+
+### ¿Cómo se Interpreta el Gráfico?
+
+* **Eje Vertical (Valor - escala log):** Muestra el tamaño del error. Cuanto **más baja** es una barra, **mejor es la predicción**.
+    * *Nota: El eje usa una escala especial (logarítmica) para poder mostrar errores muy grandes y muy pequeños en el mismo gráfico.*
+* **Las Barras:** Representan cuatro tipos de error para cada variable (Peso, Consumo, ICA y Mortalidad).
+    * **MAE (Azul):** Error absoluto promedio (en unidades de la variable).
+    * **RMSE (Verde):** Similar al MAE, pero penaliza más los errores grandes (el mejor indicador del error general).
+    * **MAPE (Rojo):** Error promedio expresado como **porcentaje** del valor real (la métrica más fácil de entender).
+    * **MSE (Naranja):** Error cuadrático medio (base del RMSE, pero menos intuitivo).
+
+---
+
+### 🔎 Conclusiones Críticas
+
+El mensaje clave es que el error es **mínimo** en las métricas de eficiencia productiva:
+
+1.  **ICA y Peso Prom. Final:** Estas variables tienen las barras de error más bajas en general, especialmente el **ICA**.
+    * El **ICA** tiene un **MAPE de solo 0.0065** (o **0.65%**), y su MAE es de **0.0107** puntos. Esto confirma que la predicción del **costo de alimento es casi perfecta**.
+    * El **Peso Prom. Final** tiene un **MAPE de 0.0075** (o **0.75%**), una precisión excelente.
+
+2.  **Por_Mort._Final (Mortalidad):**
+    * Esta variable presenta los errores absolutos más altos (**MAE de 0.3582** y **RMSE de 0.5073**). Esto es esperable porque la mortalidad es impredecible (eventos sanitarios, clima).
+    * **Importante:** A pesar de los errores absolutos altos, su **MAPE es bajo (0.0483 o 4.83%)**, lo que significa que el error se mantiene bajo control en relación con la magnitud real de la mortalidad.
+
+**En resumen:** Las métricas críticas de **eficiencia (ICA y Peso)** tienen errores prácticamente nulos, dándole la máxima confianza en la planificación del rendimiento y el costo. La **mortalidad**, aunque más variable, sigue siendo manejable y predecible en términos relativos, lo que es vital para la gestión de riesgos en la producción avícola. """
+    return mensaje
+
+    
