@@ -164,30 +164,6 @@ def plot_dispersion(y_true_df, y_pred_np, nombres):
     return fig
 
 
-def plot_barras_metricas(metricas, nombres):
-    """
-    Genera un gráfico de barras comparando las métricas de error (MAE, MSE, RMSE, MAPE) por variable.
-    Args:
-        metricas (dict): Diccionario de métricas por variable.
-        nombres (list): Lista de nombres de las variables objetivo.
-    Returns:
-        plt: Objeto matplotlib listo para mostrar con st.pyplot().
-    """
-    df_metrics = pd.DataFrame(metricas, index=nombres).T
-    # Calcular RMSE si no está
-    if 'RMSE' not in df_metrics.columns:
-        df_metrics['RMSE'] = np.sqrt(df_metrics['MSE'])
-    fig, ax = plt.subplots(figsize=(10,6))
-    df_metrics[['MAE', 'MSE', 'RMSE', 'MAPE']].plot(kind='bar', logy=True, ax=ax)
-    ax.set_title("Comparación de métricas de error")
-    ax.set_ylabel("Valor (escala log)")
-    ax.grid(True, linestyle="--", alpha=0.4)
-    for i, metric in enumerate(['MAE', 'MSE', 'RMSE', 'MAPE']):
-        for j, value in enumerate(df_metrics[metric]):
-            ax.text(j + (i - 1.5) * 0.18, value * 1.05, f"{value:.4f}", ha="center", va="bottom", fontsize=9, color="black", fontweight="bold")
-    fig.tight_layout()
-    return fig
-
 def plot_barras_r2(metricas, nombres):
     """
     Genera un gráfico de barras para los valores de R² por variable objetivo.
@@ -208,3 +184,30 @@ def plot_barras_r2(metricas, nombres):
     ax.grid(True, linestyle="--", alpha=0.4)
     fig.tight_layout()
     return fig
+
+
+
+
+def plot_barras_metricas(metricas, nombres):
+    """Genera un gráfico de barras comparando las métricas de error."""
+    df_metrics = pd.DataFrame(metricas).T
+    # Calcular RMSE si no está
+    if 'RMSE' not in df_metrics.columns:
+        df_metrics['RMSE'] = np.sqrt(df_metrics['MSE'])
+        
+    # Crea la figura y los ejes usando la función plot del DataFrame
+    fig, ax = plt.subplots(figsize=(10,6))
+    df_metrics[['MAE', 'MSE', 'RMSE', 'MAPE']].plot(kind='bar', logy=True, ax=ax)
+    
+    ax.set_title("Comparación de métricas de error")
+    ax.set_ylabel("Valor (escala log)")
+    ax.grid(True, linestyle="--", alpha=0.4)
+    
+    # Añadir etiquetas de valor
+    for i, metric in enumerate(['MAE', 'MSE', 'RMSE', 'MAPE']):
+        for j, value in enumerate(df_metrics[metric]):
+            ax.text(j + (i - 1.5) * 0.18, value * 1.05, f"{value:.4f}", ha="center", va="bottom", fontsize=9, color="black", fontweight="bold")
+            
+    fig.tight_layout()
+    return fig 
+
