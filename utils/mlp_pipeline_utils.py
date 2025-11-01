@@ -173,7 +173,7 @@ def plot_barras_metricas(metricas, nombres):
     Returns:
         plt: Objeto matplotlib listo para mostrar con st.pyplot().
     """
-    df_metrics = pd.DataFrame(metricas, index=nombres)
+    df_metrics = pd.DataFrame(metricas, index=nombres).T
     # Calcular RMSE si no está
     if 'RMSE' not in df_metrics.columns:
         df_metrics['RMSE'] = np.sqrt(df_metrics['MSE'])
