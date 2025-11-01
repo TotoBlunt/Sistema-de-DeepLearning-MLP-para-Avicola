@@ -238,62 +238,98 @@ def plot_curva_loss(history):
     ax.grid(True)
     fig.tight_layout()
     return fig
+
 def plot_boxplot_errores(y_true_df, y_pred_np, nombres):
+    """Genera un boxplot de los errores (real - predicho) para cada variable objetivo."""
     errores = {col: y_true_df[col].values - y_pred_np[:, i] for i, col in enumerate(nombres)}
     df_err = pd.DataFrame(errores)
-    plt.figure(figsize=(8,5))
-    df_err.boxplot()
-    plt.title("Boxplot de errores por variable")
-    plt.ylabel("Error (Real - Predicho)")
-    plt.grid(True, linestyle="--", alpha=0.4)
-    return plt
+    
+    # Crea la figura y los ejes (GOOD PRACTICE)
+    fig, ax = plt.subplots(figsize=(8,5))
+    df_err.boxplot(ax=ax)
+    
+    ax.set_title("Boxplot de errores por variable")
+    ax.set_ylabel("Error (Real - Predicho)")
+    ax.grid(True, linestyle="--", alpha=0.4)
+    fig.tight_layout()
+    return fig 
 
 def plot_dispersion(y_true_df, y_pred_np, nombres):
-    plt.figure(figsize=(12,8))
+    """Genera gráficos de dispersión real vs predicho para cada variable objetivo."""
+    
+    # 2 filas, 2 columnas para 4 targets
+    fig, axs = plt.subplots(2, 2, figsize=(12,8))
+    axs = axs.flatten()
+    
     for i, col in enumerate(nombres):
-        plt.subplot(2,2,i+1)
-        plt.scatter(y_true_df[col], y_pred_np[:,i], alpha=0.7)
-        plt.plot([y_true_df[col].min(), y_true_df[col].max()],
-                [y_true_df[col].min(), y_true_df[col].max()], 'r--')
-        plt.xlabel("Valor real")
-        plt.ylabel("Valor predicho")
-        plt.title(f"{col}: Real vs. Predicho")
-        plt.grid(True, linestyle="--", alpha=0.4)
-    plt.tight_layout()
-    return plt
+        # Trazado en el eje específico (axs[i])
+        axs[i].scatter(y_true_df[col], y_pred_np[:,i], alpha=0.7)
+        
+        # Línea de predicción perfecta
+        min_val = min(y_true_df[col].min(), y_pred_np[:,i].min())
+        max_val = max(y_true_df[col].max(), y_pred_np[:,i].max())
+        axs[i].plot([min_val, max_val], [min_val, max_val], 'r--')
+        
+        axs[i].set_xlabel("Valor real")
+        axs[i].set_ylabel("Valor predicho")
+        axs[i].set_title(f"{col}: Real vs. Predicho")
+        axs[i].grid(True, linestyle="--", alpha=0.4)
+        
+    fig.tight_layout()
+    return fig 
 
 def plot_barras_metricas(metricas, nombres):
-    df_metrics = pd.DataFrame(metricas, index=nombres)
-    ax = df_metrics[['MAE', 'MSE', 'RMSE', 'MAPE']].plot(kind='bar', figsize=(10,6), logy=True)
-    plt.title("Comparación de métricas de error")
-    plt.ylabel("Valor (escala log)")
-    plt.grid(True, linestyle="--", alpha=0.4)
+    """Genera un gráfico de barras comparando las métricas de error."""
+    df_metrics = pd.DataFrame(metricas).T
+    # Calcular RMSE si no está
+    if 'RMSE' not in df_metrics.columns:
+        df_metrics['RMSE'] = np.sqrt(df_metrics['MSE'])
+        
+    # Crea la figura y los ejes usando la función plot del DataFrame
+    fig, ax = plt.subplots(figsize=(10,6))
+    df_metrics[['MAE', 'MSE', 'RMSE', 'MAPE']].plot(kind='bar', logy=True, ax=ax)
+    
+    ax.set_title("Comparación de métricas de error")
+    ax.set_ylabel("Valor (escala log)")
+    ax.grid(True, linestyle="--", alpha=0.4)
+    
+    # Añadir etiquetas de valor
     for i, metric in enumerate(['MAE', 'MSE', 'RMSE', 'MAPE']):
         for j, value in enumerate(df_metrics[metric]):
             ax.text(j + (i - 1.5) * 0.18, value * 1.05, f"{value:.4f}", ha="center", va="bottom", fontsize=9, color="black", fontweight="bold")
-    plt.tight_layout()
-    return plt
+            
+    fig.tight_layout()
+    return fig 
 
 def plot_barras_r2(metricas, nombres):
-    plt.figure(figsize=(8,5))
-    bars = plt.bar(nombres, metricas['R2'], color='skyblue')
-    for i, v in enumerate(metricas['R2']):
-        plt.text(i, v+0.01, f"{v:.3f}", ha='center', fontweight='bold', fontsize=10)
-    plt.title("R² por variable")
-    plt.ylim(0, 1.05)
-    plt.ylabel("R²")
-    plt.grid(True, linestyle="--", alpha=0.4)
-    plt.tight_layout()
-    return plt
+    """Genera un gráfico de barras para los valores de R² por variable objetivo."""
+    r2_vals = [metricas[n]['R2'] for n in nombres]
+    
+    # Crea la figura y los ejes (GOOD PRACTICE)
+    fig, ax = plt.subplots(figsize=(8,5))
+    bars = ax.bar(nombres, r2_vals, color='skyblue')
+    
+    for i, v in enumerate(r2_vals):
+        ax.text(i, v + 0.01, f"{v:.3f}", ha='center', fontweight='bold', fontsize=10)
+        
+    ax.set_title("R² por variable")
+    ax.set_ylim(0, 1.05)
+    ax.set_ylabel("R²")
+    ax.grid(True, linestyle="--", alpha=0.4)
+    fig.tight_layout()
+    return fig 
 
 def plot_curva_loss(history):
-    plt.figure(figsize=(6,4))
-    plt.plot(history.history['loss'], label='Entrenamiento')
-    plt.plot(history.history['val_loss'], label='Validación')
-    plt.title("Curva de pérdida (Loss)")
-    plt.xlabel("Épocas")
-    plt.ylabel("MSE")
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    return plt
+    """Genera la curva de pérdida (loss) durante el entrenamiento y validación."""
+    # Crea la figura y los ejes (GOOD PRACTICE)
+    fig, ax = plt.subplots(figsize=(6,4))
+    
+    ax.plot(history.history['loss'], label='Entrenamiento')
+    ax.plot(history.history['val_loss'], label='Validación')
+    ax.set_title("Curva de pérdida (Loss)")
+    ax.set_xlabel("Épocas")
+    ax.set_ylabel("MSE")
+    ax.legend()
+    ax.grid(True)
+    fig.tight_layout()
+    return fig
