@@ -220,22 +220,57 @@ def explicacion_metricas():
         "details": """
         * **Valor Ideal:** Cercano a 1.0 (o 100%).
         * **Análisis:** Con valores cercanos a **0.99**, el modelo tiene un poder predictivo casi perfecto. Más del 99% de las fluctuaciones en sus resultados están siendo capturadas, indicando una **alta fiabilidad**.
+        
+        ## 🎯 Ejemplo Ilustrativo para ICA (R²: 98.98%)
+
+Si el **Coeficiente de Determinación (R²)** para el ICA es del **98.98%**:
+
+* El R² mide la proporción de la **varianza de la variable objetivo** (ICA) que puede ser **explicada por las variables de entrada** (features) de tu modelo.
+* Un valor de **98.98%** es extremadamente alto, casi perfecto.
+* **Esto significa que el 98.98% de la variación total observada** en el Índice de Conversión Alimenticia (ICA) de los lotes se debe a los factores que el modelo ha aprendido (como Peso Semanal, Edad, Área, etc.).
+* Solo el **1.02%** de la variación del ICA queda sin explicar (atribuible a ruido, factores no medidos o aleatoriedad).
+
+**Interpretación:** Un R² tan cercano a 1.0 (o 100%) indica que el modelo tiene un **poder predictivo excepcional** y se ajusta a los datos de manera casi perfecta.
         """
     },
+    
     "MAPE": {
         "title": "MAPE (Error Porcentual Absoluto Medio) - Error en Porcentaje",
         "info": "Mide el error de predicción en términos porcentuales, el desvío promedio respecto al valor real.",
         "details": """
         * **Valor Ideal:** Cercano a 0.
         * **Análisis:** Valores muy bajos (ej. < 1%) significan que el desvío promedio es mínimo. El bajo MAPE en **ICA** (Conversión Alimenticia) es crucial, indicando **alta precisión en la gestión de costos**.
+        
+## 🎯 Ejemplo Ilustrativo para ICA (MAPE: 0.54%)
+
+Si un lote de pollos tuvo un **Índice de Conversión Alimenticia (ICA) real de 1.50**:
+
+* El modelo predijo un valor que está, en promedio, a un **0.54%** de ese valor real.
+* El **error absoluto promedio** sería: 1.50 x 0.54% ≈ **0.0081** puntos de ICA.
+* Esto significa que el modelo suele predecir el ICA en algún punto entre aproximadamente **1.4919** y **1.5081** para ese lote.
+
+**Interpretación:** Un MAPE menor al 1% indica una precisión excepcional. El modelo es capaz de anticipar el ICA con un margen de error muy estrecho, lo que es vital para optimizar la alimentación y maximizar la rentabilidad en la producción avícola.
         """
     },
+    
     "MAE": {
         "title": "MAE (Error Absoluto Medio) - Desvío Promedio Directo",
         "info": "Mide el error promedio en las unidades originales de cada métrica (ej. gramos o puntos de %).",
         "details": """
         * **Valor Ideal:** Cercano a 0.
         * **Análisis:** Ofrece una visión práctica. Si la **Mortalidad Final** tiene un MAE de 0.30, la predicción se desvía en promedio en **0.30 puntos porcentuales**. Confirma que el modelo es preciso en la escala real de su negocio.
+        
+        ## 🎯 Ejemplo Ilustrativo para ICA (MAE: 0.0088)
+
+Si un lote de pollos tuvo un **Índice de Conversión Alimenticia (ICA) real de 1.50**:
+
+* El **Error Absoluto Medio (MAE)** es de **0.0088**.
+* El MAE es una métrica absoluta que se expresa en las **mismas unidades** que la variable objetivo (puntos de ICA).
+* Esto significa que, en promedio, el modelo se equivoca por solo **0.0088 puntos de ICA** en sus predicciones, independientemente de la magnitud real del ICA.
+* El rango de predicción para este lote sería: **1.50 ± 0.0088**.
+* El modelo suele predecir el ICA en algún punto entre aproximadamente **1.4912** y **1.5088** para ese lote.
+
+**Interpretación:** Un MAE tan bajo (cercano a cero) indica una **precisión excelente** en términos de la magnitud real del error. El modelo es capaz de anticipar el ICA con un margen de error muy estrecho, lo que es vital para optimizar la alimentación y maximizar la rentabilidad en la producción avícola.
         """
     },
     "RMSE": {
@@ -243,13 +278,36 @@ def explicacion_metricas():
         "info": "Pone el error en las mismas unidades originales que el MAE, pero penaliza los errores muy grandes (atípicos).",
         "details": """
         * **Análisis:** El **RMSE** es solo ligeramente superior al **MAE**. Esto indica que el modelo **no cometió errores atípicos ni catastróficos** en los datos de validación, asegurando que la precisión es consistente y estable.
-        """
+        
+        ## 🎯 Ejemplo Ilustrativo para ICA (RMSE: 0.0126)
+
+Si un lote de pollos tuvo un **Índice de Conversión Alimenticia (ICA) real de 1.50**:
+
+* El **RMSE (Root Mean Square Error)** es de **0.0126**.
+* El RMSE es una métrica absoluta que se expresa en las **mismas unidades** que la variable objetivo (puntos de ICA).
+* El RMSE es particularmente útil porque penaliza los errores grandes **más severamente** que el MAE, por lo que es un buen indicador del rendimiento general, incluyendo los casos atípicos.
+* Esto significa que, en promedio, la **magnitud típica del error** de tu modelo es de **0.0126 puntos de ICA**.
+* El rango de predicción para este lote sería: **1.50 ± 0.0126**.
+* El modelo suele predecir el ICA en algún punto entre aproximadamente **1.4874** y **1.5126** para ese lote.
+
+**Interpretación:** Un RMSE de 0.0126, muy cercano a cero y similar al MAE (0.0088), indica que el modelo no solo es preciso, sino que también **evita grandes errores** y es **robusto** en sus predicciones.
+"""
     },
     "MSE": {
         "title": "MSE (Error Cuadrático Medio)",
         "info": "Mide el error promedio al cuadrado. Es la base del RMSE y castiga fuertemente las predicciones muy lejanas.",
         "details": """
         * **Análisis:** Los valores muy cercanos a cero (ej. 0.0007) confirman que el modelo es **altamente preciso** y que la penalización por errores grandes es mínima.
+        
+        ### 🐔 Ejemplo Ilustrativo: Error en el ICA
+        
+        Dado que el **MSE para el ICA es de 0.0002**, esto demuestra que el modelo es excepcionalmente preciso en la predicción de la eficiencia del alimento:
+        
+        1.  **Imaginemos un lote** donde el valor **real** del ICA es **1.600**.
+        2.  Un MSE de $0.0002$ significa que el error al cuadrado de la predicción fue, en promedio, ese valor.
+        3.  Para tener un error de $0.0002$, el desvío promedio real de la predicción es la raíz cuadrada de ese número, lo que equivale a **$0.014$ unidades de ICA**.
+        
+        * **Conclusión Práctica:** Si el valor real del lote es **1.600**, el modelo predijo un valor muy cercano a **$1.600 \pm 0.014$** (es decir, entre $1.586$ y $1.614$). Este nivel de exactitud valida la fiabilidad del modelo para optimizar la compra y gestión del alimento.
         """
     }
 }    
