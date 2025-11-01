@@ -277,7 +277,7 @@ else: # modo_prediccion == "Batch (archivo)"
                     
                     # 1. Mostrar los valores de la métrica (tu código original)
                     st.markdown("##### Valores por Variable (Modelo Entrenado):")
-                    cols_met = st.columns(4)
+                    cols_met = st.columns(4) * 100  # Reutilizar columnas para cada métrica
                     for i, var in enumerate(TARGETS):
                         with cols_met[i]:
                             # Lógica para obtener el valor (RMSE requiere MSE)
