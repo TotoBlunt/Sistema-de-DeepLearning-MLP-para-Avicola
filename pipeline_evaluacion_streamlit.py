@@ -57,6 +57,11 @@ st.markdown("---")
 st.markdown("Sube tu archivo, escoge métricas y gráficas, y evalúa el modelo de forma interactiva.")
 
 # Sidebar para selección de métricas y gráficas
+
+# Nuevo: Selector de modo de predicción
+st.sidebar.header("Modo de predicción")
+modo_prediccion = st.sidebar.radio("Selecciona el modo de predicción:", ["Manual", "Batch (archivo)"])
+
 st.sidebar.header("Visualización de Métricas y Gráficas")
 metricas_opciones = [
     "MAE", "MSE", "RMSE", "MAPE", "R2", "Boxplot de errores", "Dispersión real vs predicho", "Barras de métricas", "Barras de R2", "Curva de pérdida (Loss)"
@@ -78,13 +83,82 @@ if modo == "ranking":
     rank_by = st.sidebar.selectbox("Columna para ranking", [f"{t}_Pred" for t in TARGETS])
 
 # =================== CARGA DE ARCHIVO ===================
-uploaded_file = st.file_uploader(
-    "Sube tu archivo Excel (.xlsx) o CSV (.csv) con las variables de entrada.",
-    type=["xlsx", "csv", "xlsm"],
-    key="file_uploader_eval"
-)
 
-# =================== PROCESAMIENTO Y EVALUACIÓN ===================
+# =================== ENTRADA DE DATOS ===================
+df_clean = None
+results_df = None
+df_out = None
+
+if modo_prediccion == "Manual":
+    st.subheader("Predicción manual de variables")
+    manual_inputs = {}
+    for feat in FEATURES:
+        if feat == "Area" and area_options is not None:
+            manual_inputs[feat] = st.selectbox(f"{feat}", area_options)
+        else:
+            manual_inputs[feat] = st.number_input(f"{feat}", value=0.0, format="%0.4f")
+    if st.button("Predecir manualmente"):
+        # Construir DataFrame de una sola fila
+        df_manual = pd.DataFrame([manual_inputs])
+        # Codificar Area si es necesario
+        if "Area" in FEATURES and le_area is not None:
+            df_manual["Area"] = le_area.transform([df_manual["Area"].iloc[0]])
+        df_clean = df_manual
+        results_df = predict_batch(df_clean, model, X_scaler, y_scaler)
+        df_out = pd.concat([df_clean.reset_index(drop=True), results_df], axis=1)
+        st.success("✅ Predicción manual completada")
+        st.dataframe(df_out)
+        # Mostrar métricas no aplica aquí (solo batch), pero mostrar resultados
+        st.write("Resultados predichos:")
+        for i, var in enumerate(TARGETS):
+            st.write(f"{var}: {results_df.iloc[0, i]:.4f}")
+else:
+    uploaded_file = st.file_uploader(
+        "Sube tu archivo Excel (.xlsx) o CSV (.csv) con las variables de entrada.",
+        type=["xlsx", "csv", "xlsm"],
+        key="file_uploader_eval"
+    )
+    if uploaded_file is not None:
+        try:
+            if uploaded_file.name.endswith('.csv'):
+                df = pd.read_csv(uploaded_file)
+            else:
+                df = pd.read_excel(uploaded_file)
+        except Exception as e:
+            st.error(f"Error al leer el archivo: {e}")
+            st.stop()
+
+        missing_cols = [f for f in FEATURES if f not in df.columns]
+        if missing_cols:
+            st.error(f"Faltan las siguientes columnas en el archivo: {missing_cols}")
+            st.stop()
+
+        df_clean = clean_data(df, le_area)
+        results_df = predict_batch(df_clean, model, X_scaler, y_scaler)
+        df_out = pd.concat([df_clean.reset_index(drop=True), results_df], axis=1)
+
+        if modo == "cluster":
+            kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+            clusters = kmeans.fit_predict(results_df)
+            df_out['Cluster'] = clusters
+
+        if modo == "ranking":
+            df_out = df_out.sort_values(by=rank_by, ascending=False)
+            df_out['Ranking'] = np.arange(1, len(df_out)+1)
+
+        st.success("✅ Evaluación completada")
+        st.subheader("Resultados (primeros 10 registros)")
+        st.dataframe(df_out.head(10))
+        csv = df_out.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="⬇️ Descargar resultados en CSV",
+            data=csv,
+            file_name="resultados_evaluacion.csv",
+            mime="text/csv"
+        )
+
+
+# =================== FUNCIONES DE PROCESAMIENTO Y PREDICCIÓN ===================
 def clean_data(df, le_area=None):
     df = df.copy()
     df = df.dropna(subset=FEATURES)
