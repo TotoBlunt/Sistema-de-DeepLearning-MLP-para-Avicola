@@ -102,7 +102,7 @@ modo_prediccion = st.sidebar.radio("Selecciona el modo de predicción:", ["Manua
 
 st.sidebar.header("Visualización de Métricas y Gráficas")
 metricas_opciones = [
-    "MAE", "MSE", "RMSE", "MAPE", "R2", "Boxplot de errores", "Dispersión real vs predicho", "Barras de métricas",  "Curva de pérdida (Loss), Gráfico de Interpretabilidad SHAP"
+    "MAE", "MSE", "RMSE", "MAPE", "R2", "Boxplot de errores", "Dispersión real vs predicho", "Barras de métricas",  "Curva de pérdida (Loss)","Gráfico de Interpretabilidad SHAP"
 ]
 metricas_seleccionadas = st.sidebar.multiselect(
     "Selecciona las métricas y gráficas a mostrar:",
