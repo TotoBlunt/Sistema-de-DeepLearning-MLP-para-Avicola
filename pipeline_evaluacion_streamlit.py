@@ -347,7 +347,7 @@ else: # modo_prediccion == "Batch (archivo)"
                         st.write("Boxplot de Errores")
                         fig = plot_boxplot_errores(y_true_df, y_pred_np, TARGETS)
                         st.pyplot(fig)
-                        plt.close(fig)
+                        plt.close('all')
                     except Exception as e:
                         st.info(f"No se pudo generar el Boxplot de errores: {e}")
                     
@@ -357,7 +357,7 @@ else: # modo_prediccion == "Batch (archivo)"
                         st.write("Gráfico de Dispersión Real vs Predicho")
                         fig = plot_dispersion(y_true_df, y_pred_np, TARGETS)
                         st.pyplot(fig)
-                        plt.close(fig)
+                        plt.close('all')
                     except Exception as e:
                         st.info(f"No se pudo generar el gráfico de Dispersión: {e}")
                     
@@ -384,7 +384,7 @@ else: # modo_prediccion == "Batch (archivo)"
                             st.write("Barras de Métricas (Lote Actual)")
                             fig = plot_barras_metricas(metricas_batch, TARGETS)
                             st.pyplot(fig)
-                            plt.close(fig)
+                            plt.close('all')
                         except Exception as e:
                             st.info(f"No se pudo generar las barras de métricas: {e}")
                         
@@ -393,7 +393,7 @@ else: # modo_prediccion == "Batch (archivo)"
                             st.write("Barras de R2 (Lote Actual)")
                             fig = plot_barras_r2(metricas_batch, TARGETS)
                             st.pyplot(fig)
-                            plt.close(fig)
+                            plt.close('all')
                         except Exception as e:
                             st.info(f"No se pudo generar las barras de R2: {e}")
             
