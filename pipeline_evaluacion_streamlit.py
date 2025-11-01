@@ -277,19 +277,28 @@ else: # modo_prediccion == "Batch (archivo)"
                     
                     # 1. Mostrar los valores de la métrica (tu código original)
                     st.markdown("##### Valores por Variable (Modelo Entrenado):")
-                    cols_met = st.columns(4) * 100  # Reutilizar columnas para cada métrica
+                    cols_met = st.columns(4)   # Reutilizar columnas para cada métrica
                     for i, var in enumerate(TARGETS):
                         with cols_met[i]:
-                            # Lógica para obtener el valor (RMSE requiere MSE)
+                            # 1. Lógica para obtener el valor (RMSE requiere MSE)
                             if met == "RMSE":
                                 mse_val = metrics_dict.get(var, {}).get("MSE", None)
                                 valor = np.sqrt(mse_val) if mse_val is not None else None
                             else:
                                 valor = metrics_dict.get(var, {}).get(met, None)
                             
-                            # Mostrar el valor con st.metric
                             if valor is not None:
-                                st.metric(label=var, value=f"{valor:.4f}")
+                                
+                                # 2. LÓGICA DE FORMATO DE PORCENTAJE AGREGADA AQUÍ
+                                if met in ["R2", "MAPE"]:
+                                    # Multiplicar por 100 y formatear como porcentaje
+                                    valor_formateado = f"{valor * 100:.2f} %" # Usamos .2f para precisión de porcentaje
+                                else:
+                                    # Para MAE, MSE, RMSE: Formato decimal estándar
+                                    valor_formateado = f"{valor:.4f}"
+                                
+                                # 3. Mostrar el valor con st.metric
+                                st.metric(label=var, value=valor_formateado)
                             else:
                                 st.metric(label=var, value="N/A")
                                 
