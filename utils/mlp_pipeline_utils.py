@@ -256,8 +256,7 @@ def explicacion_metricas():
     return METRIC_EXPLANATIONS
 
 def explic_loss():
-    mensaje = 
-    """
+    mensaje = """
     ## 📉 Explicación de la Curva de Pérdida (Loss)
     
     Esta gráfica es su **medidor de confianza** en la capacidad del modelo para predecir las cuatro métricas clave (Peso Final, Consumo, ICA, Mortalidad).
