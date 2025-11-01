@@ -14,7 +14,7 @@ from tensorflow.keras.models import load_model # Importación necesaria aquí pa
 
 # Asume que estas funciones están en utils/mlp_pipeline_utils.py
 # Si no lo están, asegúrate de que existen o define las funciones
-from utils.mlp_pipeline_utils import plot_boxplot_errores, plot_dispersion, plot_barras_metricas, plot_barras_r2
+from utils.mlp_pipeline_utils import plot_boxplot_errores, plot_dispersion, plot_barras_metricas, plot_barras_r2,explicacion_metricas,explic_loss
 
 # =================== CONFIGURACIÓN Y CARGA DE RECURSOS ===================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -260,46 +260,7 @@ else: # modo_prediccion == "Batch (archivo)"
             # Mostrar Métricas Fijas (del archivo JSON guardado)
     if metrics_dict:
         st.markdown("#### Métricas Generales del Modelo (Datos de Entrenamiento/Validación Guardados)")
-        METRIC_EXPLANATIONS = {
-    "R2": {
-        "title": "R² (Coeficiente de Determinación) - Poder Explicativo",
-        "info": "Mide el porcentaje de las variaciones que son explicadas por el modelo.",
-        "details": """
-        * **Valor Ideal:** Cercano a 1.0 (o 100%).
-        * **Análisis:** Con valores cercanos a **0.99**, el modelo tiene un poder predictivo casi perfecto. Más del 99% de las fluctuaciones en sus resultados están siendo capturadas, indicando una **alta fiabilidad**.
-        """
-    },
-    "MAPE": {
-        "title": "MAPE (Error Porcentual Absoluto Medio) - Error en Porcentaje",
-        "info": "Mide el error de predicción en términos porcentuales, el desvío promedio respecto al valor real.",
-        "details": """
-        * **Valor Ideal:** Cercano a 0.
-        * **Análisis:** Valores muy bajos (ej. < 1%) significan que el desvío promedio es mínimo. El bajo MAPE en **ICA** (Conversión Alimenticia) es crucial, indicando **alta precisión en la gestión de costos**.
-        """
-    },
-    "MAE": {
-        "title": "MAE (Error Absoluto Medio) - Desvío Promedio Directo",
-        "info": "Mide el error promedio en las unidades originales de cada métrica (ej. gramos o puntos de %).",
-        "details": """
-        * **Valor Ideal:** Cercano a 0.
-        * **Análisis:** Ofrece una visión práctica. Si la **Mortalidad Final** tiene un MAE de 0.30, la predicción se desvía en promedio en **0.30 puntos porcentuales**. Confirma que el modelo es preciso en la escala real de su negocio.
-        """
-    },
-    "RMSE": {
-        "title": "RMSE (Raíz del Error Cuadrático Medio) - Castigo de Errores Grandes",
-        "info": "Pone el error en las mismas unidades originales que el MAE, pero penaliza los errores muy grandes (atípicos).",
-        "details": """
-        * **Análisis:** El **RMSE** es solo ligeramente superior al **MAE**. Esto indica que el modelo **no cometió errores atípicos ni catastróficos** en los datos de validación, asegurando que la precisión es consistente y estable.
-        """
-    },
-    "MSE": {
-        "title": "MSE (Error Cuadrático Medio)",
-        "info": "Mide el error promedio al cuadrado. Es la base del RMSE y castiga fuertemente las predicciones muy lejanas.",
-        "details": """
-        * **Análisis:** Los valores muy cercanos a cero (ej. 0.0007) confirman que el modelo es **altamente preciso** y que la penalización por errores grandes es mínima.
-        """
-    }
-}
+        METRIC_EXPLANATIONS = explicacion_metricas()
         
         # Mostrar métricas seleccionadas
         for met in metricas_seleccionadas:
@@ -403,25 +364,8 @@ else: # modo_prediccion == "Batch (archivo)"
                 if os.path.exists(curva_path):
                     st.image(curva_path, caption="Curva de pérdida (Loss)")
                     # 1.2 Insertar la explicación concisa
-                    st.markdown(
-    """
-    ## 📉 Explicación de la Curva de Pérdida (Loss)
-    
-    Esta gráfica es su **medidor de confianza** en la capacidad del modelo para predecir las cuatro métricas clave (Peso Final, Consumo, ICA, Mortalidad).
-    
-    * **¿Qué mide la Pérdida (Loss)?**
-        * Mide el **Error Cuadrático Medio (MSE)**. Es el **error promedio** del modelo. Se usa porque cuantifica la distancia entre las predicciones del modelo y los valores reales observados. Un valor más bajo (cercano a cero) significa un modelo más preciso.
-    
-    * **Línea Azul (Entrenamiento):** Muestra el error con los **datos históricos ya conocidos**.
-    * **Línea Naranja (Validación):** Muestra el error con los **datos que nunca ha visto**. Este es el error más importante, ya que indica la **confiabilidad** del modelo en lotes futuros.
-    
-    **📈 Diagnóstico de Calidad del Aprendizaje:**
-    
-    El modelo presenta un **aprendizaje óptimo y robusto**. El hecho de que las curvas de Entrenamiento (Azul) y Validación (Naranja) **coincidan tan de cerca** a lo largo de las 200 épocas significa que el modelo **no ha memorizado** datos viejos (no hay sobreajuste).
-    
-    **Conclusión:** Puede confiar en que las predicciones y las explicaciones de factores son **consistentes y válidas** para evaluar lotes nuevos, ya que el modelo aprendió las **reglas fundamentales** de su negocio avícola.
-    """
-    )
+                    mensaje = explic_loss()
+                    st.markdown(mensaje)
                 else:
                     st.info("No se encontró la curva de pérdida guardada.")
                     
