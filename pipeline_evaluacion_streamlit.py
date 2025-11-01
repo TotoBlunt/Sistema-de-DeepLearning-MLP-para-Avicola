@@ -22,7 +22,7 @@ MODEL_PATH = os.path.join(BASE_DIR, "modelos", "modelo_9vars_multisalida.keras")
 X_SCALER_PATH = os.path.join(BASE_DIR, "modelos", "X_scaler_9vars.pkl")
 Y_SCALER_PATH = os.path.join(BASE_DIR, "modelos", "y_scaler_4targets.pkl")
 LE_AREA_PATH = os.path.join(BASE_DIR, "modelos", "label_encoder_tipo_area.pkl")
-METRICS_PATH = os.path.join(BASE_DIR, "utils", "metrics_9vars_multisalida.json")
+METRICS_PATH = os.path.join(BASE_DIR, "modelos", "metrics_9vars_multisalida.json")
 
 FEATURES = [
     'PorcMortSem4','PorcMortSem5', 'PorcMortSem6','PesoSem4', 'PesoSem5', 'Pob Inicial',
