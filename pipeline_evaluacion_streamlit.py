@@ -84,6 +84,7 @@ if modo == "ranking":
 
 # =================== CARGA DE ARCHIVO ===================
 
+uploaded_file = None
 # =================== ENTRADA DE DATOS ===================
 df_clean = None
 results_df = None
@@ -156,6 +157,7 @@ else:
             file_name="resultados_evaluacion.csv",
             mime="text/csv"
         )
+
 
 
 # =================== FUNCIONES DE PROCESAMIENTO Y PREDICCIÓN ===================
