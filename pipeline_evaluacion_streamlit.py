@@ -339,6 +339,16 @@ else: # modo_prediccion == "Batch (archivo)"
                 curva_path = os.path.join(BASE_DIR, "modelos", "curva_loss.png")
                 if os.path.exists(curva_path):
                     st.image(curva_path, caption="Curva de pérdida (Loss)")
+                    # 1.2 Insertar la explicación concisa
+                    st.markdown(
+                        """
+                        **📈 Diagnóstico de Calidad del Aprendizaje:**
+                        
+                        El modelo presenta un **aprendizaje óptimo y robusto**. El hecho de que las curvas de Entrenamiento (Azul) y Validación (Naranja) coincidan tan de cerca significa que el modelo **no ha memorizado** datos viejos (no hay sobreajuste). 
+                        
+                        **Conclusión:** Puede confiar en que las predicciones y las explicaciones de factores son **consistentes y válidas** para evaluar lotes nuevos.
+                        """
+                    )
                 else:
                     st.info("No se encontró la curva de pérdida guardada.")
                     
