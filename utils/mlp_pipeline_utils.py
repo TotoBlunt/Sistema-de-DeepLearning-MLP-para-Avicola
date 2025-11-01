@@ -221,7 +221,7 @@ def explicacion_metricas():
         * **Valor Ideal:** Cercano a 1.0 (o 100%).
         * **Análisis:** Con valores cercanos a **0.99**, el modelo tiene un poder predictivo casi perfecto. Más del 99% de las fluctuaciones en sus resultados están siendo capturadas, indicando una **alta fiabilidad**.
         
-        ### 🎯 Ejemplo Ilustrativo para ICA (R²: 98.98%)
+        ## 🎯 Ejemplo Ilustrativo para ICA (R²: 98.98%)
 
         Si el **Coeficiente de Determinación (R²)** para el ICA es del **98.98%**:
 
@@ -241,7 +241,7 @@ def explicacion_metricas():
         * **Valor Ideal:** Cercano a 0.
         * **Análisis:** Valores muy bajos (ej. < 1%) significan que el desvío promedio es mínimo. El bajo MAPE en **ICA** (Conversión Alimenticia) es crucial, indicando **alta precisión en la gestión de costos**.
         
-        ### 🎯 Ejemplo Ilustrativo para ICA (MAPE: 0.54%)
+        ## 🎯 Ejemplo Ilustrativo para ICA (MAPE: 0.54%)
 
         Si un lote de pollos tuvo un **Índice de Conversión Alimenticia (ICA) real de 1.50**:
 
@@ -260,7 +260,7 @@ def explicacion_metricas():
         * **Valor Ideal:** Cercano a 0.
         * **Análisis:** Ofrece una visión práctica. Si la **Mortalidad Final** tiene un MAE de 0.30, la predicción se desvía en promedio en **0.30 puntos porcentuales**. Confirma que el modelo es preciso en la escala real de su negocio.
         
-        ### 🎯 Ejemplo Ilustrativo para ICA (MAE: 0.0088)
+        ## 🎯 Ejemplo Ilustrativo para ICA (MAE: 0.0088)
 
         Si un lote de pollos tuvo un **Índice de Conversión Alimenticia (ICA) real de 1.50**:
 
@@ -279,7 +279,7 @@ def explicacion_metricas():
         "details": """
         * **Análisis:** El **RMSE** es solo ligeramente superior al **MAE**. Esto indica que el modelo **no cometió errores atípicos ni catastróficos** en los datos de validación, asegurando que la precisión es consistente y estable.
         
-        ### 🎯 Ejemplo Ilustrativo para ICA (RMSE: 0.0126)
+        ## 🎯 Ejemplo Ilustrativo para ICA (RMSE: 0.0126)
 
         Si un lote de pollos tuvo un **Índice de Conversión Alimenticia (ICA) real de 1.50**:
 
@@ -299,7 +299,7 @@ def explicacion_metricas():
         "details": """
         * **Análisis:** Los valores muy cercanos a cero (ej. 0.0007) confirman que el modelo es **altamente preciso** y que la penalización por errores grandes es mínima.
         
-        ### 🐔 Ejemplo Ilustrativo: Error en el ICA
+        ## 🐔 Ejemplo Ilustrativo: Error en el ICA
         
         Dado que el **MSE para el ICA es de 0.0002**, esto demuestra que el modelo es excepcionalmente preciso en la predicción de la eficiencia del alimento:
         
@@ -332,3 +332,31 @@ def explic_loss():
     **Conclusión:** Puede confiar en que las predicciones y las explicaciones de factores son **consistentes y válidas** para evaluar lotes nuevos, ya que el modelo aprendió las **reglas fundamentales** de su negocio avícola.
     """
     return mensaje
+
+def explic_plot_comparacion():
+    return """
+    # 📈 Evaluación Visual: Realidad vs. Predicción
+
+Esta gráfica, el **Gráfico de Dispersión Real vs. Predicho**, es la mejor manera de entender la **confiabilidad** de nuestro modelo de inteligencia artificial para sus lotes de pollos.
+
+---
+
+### ¿Qué Estamos Viendo?
+
+Imagine la línea roja punteada (diagonal) como el camino de la **predicción perfecta**. Cada punto que cae sobre esta línea significa: **Modelo predijo = Resultado Real en Granja.**
+
+* **Puntos Azules (Lotes de Producción):** Representan el resultado de cada lote que hemos analizado.
+    * **Eje Horizontal:** El valor que **realmente** obtuvimos (el resultado real).
+    * **Eje Vertical:** El valor que el **modelo predijo** (la estimación de la IA).
+
+---
+
+### Conclusión Crucial para el Negocio
+
+El mensaje del gráfico es que el modelo es **sumamente preciso** en los cuatro indicadores clave:
+
+1.  **Alineación Casi Perfecta:** En los cuatro gráficos, los puntos azules están **casi perfectamente pegados** a la línea roja.
+2.  **Alto Poder Predictivo:** Esto significa que, ya sea prediciendo el **Peso Prom. Final**, el **Porc Consumo**, el **ICA** (Índice de Conversión Alimenticia) o la **Mortalidad**, el modelo está dando estimaciones que están **extremadamente cerca de lo que realmente sucede** en el corral.
+
+**En resumen:** Nuestro modelo es una **herramienta de planificación altamente fiable**. Puede proyectar rendimientos y costos con **máxima confianza**, ya que la estimación de la IA iguala casi exactamente los resultados de la vida real. """
+

@@ -14,7 +14,7 @@ from tensorflow.keras.models import load_model # Importación necesaria aquí pa
 
 # Asume que estas funciones están en utils/mlp_pipeline_utils.py
 # Si no lo están, asegúrate de que existen o define las funciones
-from utils.mlp_pipeline_utils import plot_boxplot_errores, plot_dispersion, plot_barras_metricas, plot_barras_r2,explicacion_metricas,explic_loss
+from utils.mlp_pipeline_utils import plot_boxplot_errores, plot_dispersion, plot_barras_metricas, plot_barras_r2,explicacion_metricas,explic_loss, explic_plot_comparacion
 
 # =================== CONFIGURACIÓN Y CARGA DE RECURSOS ===================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -328,6 +328,8 @@ else: # modo_prediccion == "Batch (archivo)"
                         fig = plot_dispersion(y_true_df, y_pred_np, TARGETS)
                         st.pyplot(fig)
                         plt.close('all')
+                        explicacion = explic_plot_comparacion()
+                        st.markdown(explicacion)
                     except Exception as e:
                         st.info(f"No se pudo generar el gráfico de Dispersión: {e}")
                     
