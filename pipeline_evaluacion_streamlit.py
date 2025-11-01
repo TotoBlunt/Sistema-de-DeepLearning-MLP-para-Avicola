@@ -341,14 +341,24 @@ else: # modo_prediccion == "Batch (archivo)"
                     st.image(curva_path, caption="Curva de pérdida (Loss)")
                     # 1.2 Insertar la explicación concisa
                     st.markdown(
-                        """
-                        **📈 Diagnóstico de Calidad del Aprendizaje:**
-                        
-                        El modelo presenta un **aprendizaje óptimo y robusto**. El hecho de que las curvas de Entrenamiento (Azul) y Validación (Naranja) coincidan tan de cerca significa que el modelo **no ha memorizado** datos viejos (no hay sobreajuste). 
-                        
-                        **Conclusión:** Puede confiar en que las predicciones y las explicaciones de factores son **consistentes y válidas** para evaluar lotes nuevos.
-                        """
-                    )
+    """
+    ## 📉 Explicación de la Curva de Pérdida (Loss)
+    
+    Esta gráfica es su **medidor de confianza** en la capacidad del modelo para predecir las cuatro métricas clave (Peso Final, Consumo, ICA, Mortalidad).
+    
+    * **¿Qué mide la Pérdida (Loss)?**
+        * Mide el **Error Cuadrático Medio (MSE)**. Es el **error promedio** del modelo. Se usa porque cuantifica la distancia entre las predicciones del modelo y los valores reales observados. Un valor más bajo (cercano a cero) significa un modelo más preciso.
+    
+    * **Línea Azul (Entrenamiento):** Muestra el error con los **datos históricos ya conocidos**.
+    * **Línea Naranja (Validación):** Muestra el error con los **datos que nunca ha visto**. Este es el error más importante, ya que indica la **confiabilidad** del modelo en lotes futuros.
+    
+    **📈 Diagnóstico de Calidad del Aprendizaje:**
+    
+    El modelo presenta un **aprendizaje óptimo y robusto**. El hecho de que las curvas de Entrenamiento (Azul) y Validación (Naranja) **coincidan tan de cerca** a lo largo de las 200 épocas significa que el modelo **no ha memorizado** datos viejos (no hay sobreajuste).
+    
+    **Conclusión:** Puede confiar en que las predicciones y las explicaciones de factores son **consistentes y válidas** para evaluar lotes nuevos, ya que el modelo aprendió las **reglas fundamentales** de su negocio avícola.
+    """
+    )
                 else:
                     st.info("No se encontró la curva de pérdida guardada.")
                     
