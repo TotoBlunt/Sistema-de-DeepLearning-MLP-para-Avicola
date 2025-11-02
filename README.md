@@ -83,6 +83,13 @@ streamlit run pipeline_evaluacion_streamlit.py
 
 
 ---
+## Acceso rápido
+
+[![Abrir en Streamlit](https://mlp-avicola-metricas.streamlit.app/)
+
+
+
+---
 
 ## 📊 Resultados Esperados
 El modelo produce predicciones multisalida que permiten:
@@ -121,5 +128,6 @@ Ejemplo de salida:
 📍 Lima, Perú  
 💼 Proyecto desarrollado en el marco del área de **Desarrollo de Sistemas Inteligentes**  
 🧾 [Informe Técnico Oficial](./Informe_Tecnico_MLP_Avicola.md)
+
 
 ---
