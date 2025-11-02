@@ -31,9 +31,10 @@ Estas predicciones se basan en variables iniciales del lote como edad HTS, edad 
 ```
 Sistema-de-DeepLearning-MLP-para-Avicola/
 │
-├── 📁 data/                      # Archivos de datos de entrenamiento o validación
-│   ├── dataset_original.csv
-│   └── datos_test.csv
+├── 📁 data/                      # Archivos de datos 
+│   ├── BD_Edit_ML.xlsm             # Archivo Principal modificado por seguridad, sirvio de entrenamiento y en él
+│   │                                se basan todas las metricas del modelo
+│   └── data_sintetica.xlsx         # Archivo generado sinteticamente de acuerdo al archivo principal
 │
 ├── 📁 modelos/                                 # Modelos entrenados y escaladores
     ├── metrics_9vars_multisalida.json          # Archivo JSON de metricas del modelo
@@ -45,6 +46,7 @@ Sistema-de-DeepLearning-MLP-para-Avicola/
 ├── 📁 utils/                     # Funciones auxiliares para procesamiento y métricas
 │   ├──__init__.py
 │   ├── mlp_pipeline_utils.py       # Archivo con funciones para metricas y demas
+│   ├── sintetic.py                 # Archivo para generar la data sintetica
 │   └── modelokeras.py              #Archivo de creacion y entrenamiento del Modelo
 │
 ├── 📁 graficos/   
