@@ -15,7 +15,7 @@ import shap
 
 # Asume que estas funciones están en utils/mlp_pipeline_utils.py
 # Si no lo están, asegúrate de que existen o define las funciones
-from utils.mlp_pipeline_utils import plot_boxplot_errores, plot_dispersion, plot_barras_metricas, plot_barras_r2,explicacion_metricas,explic_loss, explic_plot_comparacion, explic_plot_boxplot_errores,explic_metricas_error,plot_shap_summary
+from utils.mlp_pipeline_utils import explic_shap, plot_boxplot_errores, plot_dispersion, plot_barras_metricas, plot_barras_r2,explicacion_metricas,explic_loss, explic_plot_comparacion, explic_plot_boxplot_errores,explic_metricas_error,explic_shap
 
 # =================== CONFIGURACIÓN Y CARGA DE RECURSOS ===================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -370,7 +370,7 @@ else: # modo_prediccion == "Batch (archivo)"
             
             # Curva de pérdida (Solo si se encuentra la imagen guardada)
             if "Curva de pérdida (Loss)" in metricas_seleccionadas:
-                curva_path = os.path.join(BASE_DIR, "modelos", "curva_loss.png")
+                curva_path = os.path.join(BASE_DIR, "graficos", "curva_loss.png")
                 if os.path.exists(curva_path):
                     st.image(curva_path, caption="Curva de pérdida (Loss)")
                     # 1.2 Insertar la explicación concisa
@@ -380,43 +380,39 @@ else: # modo_prediccion == "Batch (archivo)"
                     st.info("No se encontró la curva de pérdida guardada.")
                     
             # Gráfico de Interpretabilidad SHAP
+            # Gráfico de Interpretabilidad SHAP
             if "Gráfico de Interpretabilidad SHAP" in metricas_seleccionadas:
-                st.markdown("---")
-                st.markdown("#### Gráfico de Interpretabilidad SHAP")
-                st.info("💡 **Nota Importante:** El gráfico SHAP se genera usando los datos de entrada **escalados** del lote actual, y la explicación se centra en el primer target ('Peso Prom. Final').")
-                
-                try:
-                    # 1. Obtener los datos de FEATURES sin escalar
-                    X_df_features = df_clean[FEATURES]
-                    
-                    # 2. Obtener los datos escalados (Ya calculados o recalcular)
-                    # Es mejor usar los datos escalados del lote actual que ya tienes disponible.
-                    X_scaled_batch = X_scaler.transform(X_df_features) 
-                    
-                    # 3. Generar la figura SHAP (para el primer target, 'Peso Prom. Final')
-                    fig_shap = plot_shap_summary(
-                        model, 
-                        X_scaled_batch, 
-                        X_df_features, # El DataFrame sin escalar para etiquetas y colores
-                        FEATURES, 
-                        TARGETS[0] # Usar el nombre del primer target
-                    )
-                    
-                    st.pyplot(fig_shap)
-                    plt.close('all') # Limpieza final
+                explicacion=explic_shap()
+                st.markdown(explicacion)
 
-                    # Explicación del gráfico SHAP (puedes crear una función 'explic_shap' similar a las que ya tienes)
-                    st.markdown("""
-                        ##### 💡 Interpretación de Contribución (SHAP Summary Plot):
-                        * **Cada punto** representa una predicción en el lote actual.
-                        * **El color (Rojo/Azul)** indica el valor de la variable de entrada (Feature). **Rojo** es alto, **Azul** es bajo.
-                        * **El eje horizontal (Valor SHAP)** indica el impacto en la predicción.
-                            * Un punto muy a la **derecha** significa que esa característica **aumentó** fuertemente la predicción del target.
-                            * Un punto muy a la **izquierda** significa que esa característica **disminuyó** fuertemente la predicción del target.
-                    """)
-                    
-                except Exception as e:
-                    st.info(f"No se pudo generar el gráfico SHAP. Error: {e}")
+                import os
+
+                # Carpeta donde guardaste los gráficos SHAP
+                carpeta_shap = "graficos/graficos_shap"
+
+                # Verifica si la carpeta existe
+                if os.path.exists(carpeta_shap):
+                    archivos_shap = sorted([
+                        f for f in os.listdir(carpeta_shap)
+                        if f.endswith(".png")
+                    ])
+
+                    if archivos_shap:
+                        for archivo in archivos_shap:
+                            ruta = os.path.join(carpeta_shap, archivo)
+                            
+                            # Mostrar nombre del gráfico de forma legible
+                            nombre_limpio = archivo.replace("shap_", "").replace("_", " ").replace(".png", "")
+                            st.markdown(f"**📊 {nombre_limpio}**")
+                            st.image(ruta, use_container_width=True)
+                            st.markdown("---")
+                        
+                        st.success("✅ Gráficos SHAP cargados correctamente.")
+                    else:
+                        st.warning("⚠️ No se encontraron archivos .png en la carpeta de gráficos SHAP.")
+                else:
+                    st.error(f"❌ La carpeta '{carpeta_shap}' no existe. Verifica la ruta.")
+                
                     
         else:
             st.warning(f"⚠️ **Métricas Omitidas:** Para generar los Boxplots, Dispersión y calcular el R2 del lote actual, el archivo subido debe contener las columnas de **valores reales** ({TARGETS}).")
