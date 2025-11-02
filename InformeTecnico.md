@@ -131,8 +131,7 @@ El mensaje clave es que el error es **mínimo** en las métricas de eficiencia p
 
 ### 9. Próximos pasos y evolución
 - Incluir nuevas variables (ambiente, cama, agua).  
-- Explorar arquitecturas más avanzadas (RNN, LSTM).  
-- Incorporar interpretabilidad (SHAP, LIME).  
+- Explorar arquitecturas más avanzadas (RNN, LSTM).   
 - Escalar el sistema a múltiples granjas y entornos web.
 
 ### 10. Conclusión final 
