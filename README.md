@@ -49,11 +49,12 @@ Sistema-de-DeepLearning-MLP-para-Avicola/
 │
 ├── 📁 graficos/   
 │   ├── 📁 graficos_shap                                  # Visualizaciones generadas durante la validación
-│    │   ├──Grafico_Interpretacion_ICA.png                    #GRaficos de Interpretacion SHAP
-│    │    ├──Grafico_Interpretacion_PesoPromFinal.png
-│   │    ├──Grafico_Interpretacion_PorcConsumo.png
-│    │    └──Grafico_Interpretacion_PorcMortFinal.png
-│   └── curva_loss.png                                     #Curva de Perdida loss
+│    │   ├──Grafico_Interpretacion_ICA.png                 # Graficos de Interpretacion SHAP
+│    │   ├──Grafico_Interpretacion_PesoPromFinal.png
+│    │   ├──Grafico_Interpretacion_PorcConsumo.png
+│    │   └──Grafico_Interpretacion_PorcMortFinal.png
+│    ├── errorGrafica.png                                  # Grafica de Barra de Errores del modelo
+│    └── curva_loss.png                                    # Curva de Perdida loss
 │
 ├── pipeline_evaluacion_streamlit.py      # Versión del pipeline para predicción masiva, archivo principal
 ├── requirements.txt                      # Dependencias del proyecto
@@ -81,6 +82,21 @@ pip install -r requirements.txt
 streamlit run pipeline_evaluacion_streamlit.py
 ```
 
+---
+
+## 💻 Modos de Uso y Predicción
+
+La interfaz de Streamlit ofrece dos métodos flexibles para ingresar datos y obtener predicciones del modelo:
+
+### 1. Predicción Manual (Modo Interactivo) 🖐️
+Permite al usuario ingresar los **valores de las 9 variables de entrada (Features)** una por una a través de un formulario web. Este modo es ideal para:
+* Realizar **predicciones rápidas** para una sola unidad o lote.
+* Hacer análisis de **"qué pasaría si" (what-if)**, modificando un solo factor.
+
+### 2. Predicción Automatizada (Modo Batch - Archivo) 💾
+Permite al usuario cargar un archivo completo (CSV o Excel) que contenga múltiples filas de datos. Este modo es esencial para:
+* Evaluar el rendimiento del modelo contra **datos reales de validación**.
+* Realizar **análisis de lote** (múltiples unidades) y aplicar los modos **Cluster** y **Ranking** a una gran cantidad de datos.
 
 ---
 ## Acceso rápido
@@ -115,6 +131,23 @@ Ejemplo de salida:
 - **Ahorro de recursos:** evita sobrecostos en alimento y tratamiento.  
 - **Control operacional:** seguimiento objetivo de cada lote.  
 - **Soporte gerencial:** reportes técnicos con sustento estadístico.  
+
+---
+## 🔍 Modos de Análisis y Herramienta de Decisión (Score, Cluster, Ranking)
+
+El prototipo de Streamlit (`pipeline_evaluacion_streamlit.py`) está diseñado como una herramienta flexible que **transforma las predicciones del modelo en decisiones accionables** mediante la implementación de tres modos clave de análisis:
+
+### 1. **Modo Score (Predicción Pura)** 🎯
+* **Fin:** Genera directamente las cuatro predicciones de salida (**KPI Targets**). Es el *input* crudo del modelo.
+* **Decisión Típica:** Obtener la estimación directa (ej. el **Peso Prom. Final Predicho**) para decisiones simples y monitoreo de cumplimiento de objetivos.
+
+### 2. **Modo Cluster (Agrupación para Segmentación)** 🧩
+* **Fin:** Aplica el algoritmo **KMeans** sobre las cuatro predicciones para agrupar las unidades (lotes) en **segmentos homogéneos** (ej. "Alto Riesgo" vs. "Alto Potencial").
+* **Decisión Típica:** Permite la **segmentación de estrategias**. Se utiliza para asignar planes de manejo diferenciados, como un plan de alimentación intensivo a lotes de alto potencial o una intervención de mitigación a lotes de alto riesgo.
+
+### 3. **Modo Ranking (Clasificación por Prioridad)** 🥇
+* **Fin:** Ordena las unidades de datos basándose en el valor de una **única predicción seleccionada** por el usuario (ej. `Por_Mort._Final_Pred`).
+* **Decisión Típica:** Facilita la **asignación de recursos limitados y la priorización de tareas**. Si el ranking es por la mortalidad predicha más alta, el equipo veterinario sabrá exactamente a qué lotes debe priorizar para una inspección.
 
 ---
 
