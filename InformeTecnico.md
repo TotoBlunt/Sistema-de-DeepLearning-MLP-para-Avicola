@@ -95,7 +95,7 @@ El mensaje clave es que el error es **mínimo** en las métricas de eficiencia p
 
 **En resumen:** Las métricas críticas de **eficiencia (ICA y Peso)** tienen errores prácticamente nulos, dándole la máxima confianza en la planificación del rendimiento y el costo. La **mortalidad**, aunque más variable, sigue siendo manejable y predecible en términos relativos, lo que es vital para la gestión de riesgos en la producción avícola. 
 
-![Curva de Perdida](graficos/curva_loss.png.png)
+![Curva de Perdida](graficos/curva_loss.png)
 #### 📉 Explicación de la Curva de Pérdida (Loss)
     
 Esta gráfica es su **medidor de confianza** en la capacidad del modelo para predecir las cuatro métricas clave (Peso Final, Consumo, ICA, Mortalidad).
@@ -111,6 +111,8 @@ Esta gráfica es su **medidor de confianza** en la capacidad del modelo para pre
 El modelo presenta un **aprendizaje óptimo y robusto**. El hecho de que las curvas de Entrenamiento (Azul) y Validación (Naranja) **coincidan tan de cerca** a lo largo de las 200 épocas significa que el modelo **no ha memorizado** datos viejos (no hay sobreajuste).
     
 **Conclusión:** Puede confiar en que las predicciones y las explicaciones de factores son **consistentes y válidas** para evaluar lotes nuevos, ya que el modelo aprendió las **reglas fundamentales** de su negocio avícola.
+
+### Grafico de Interpretacion ICA
 
 ![SHAP Explication](graficos/graficos_shap/Grafico_Interpretacion_ICA.png)
 
@@ -129,6 +131,8 @@ En resumen: Este análisis valida el conocimiento operativo con datos. Para mejo
 1.	Priorizar la sanidad total en las últimas semanas (reducir PorcMortSem6).
 2.	Asegurar el crecimiento óptimo en las semanas clave 4 y 5 (aumentar PesoSem4/5).
 
+### Grafico de Interpretacion Peso Promedio Final
+
 ![SHAP Explciation](graficos/graficos_shap/Grafico_Interpretacion_PesoPromFinal.png)
 
 Este gráfico de Importancia de Características (SHAP) para el Peso Promedio Final es esencial para San Fernando S.A. porque les dice con claridad qué factores operativos tienen el mayor peso a la hora de determinar el peso final del pollo.
@@ -144,6 +148,8 @@ Direccion de la Influencia: Muestra cómo se relaciona cada variable con el Peso
 3.	Mortalidad (Semana 5 y 6): Ambas muestran una dispersión alrededor del cero, pero los puntos Rojos (alta mortalidad) tienen una ligera tendencia a la izquierda (disminuyen el peso). Impacto: Aunque no son los factores principales, una alta mortalidad tiende a penalizar levemente el peso final, posiblemente por el impacto en el bienestar o densidad.
 En Resumen: Para San Fernando S.A., los datos confirman la máxima del negocio: Tiempo y Crecimiento son la prioridad. La mejor manera de asegurar un alto Peso Promedio Final es garantizar los días completos de crianza (Edad Granja) y monitorear estrictamente el Peso Semanal en la Semana 5.
 
+### Grafico de Interpretacion Porcentaje por Consumo
+
 ![SHAP](graficos/graficos_shap/Grafico_Interpretacion_PorcConsumo.png)
 
 Este gráfico revela qué variables tienen la mayor influencia sobre la cantidad de alimento que un lote va a consumir. Permite al negocio predecir y planificar el consumo con base en datos operativos clave.
@@ -157,6 +163,8 @@ Direccion de Influencia: Muestra cómo cada factor impacta el Porcentaje de Cons
 2.	PesoSem5: Los puntos Rojos (alto peso a la semana 5) se agrupan a la derecha, y los Azules (bajo peso) se agrupan a la izquierda. Impacto: El buen crecimiento aumenta la demanda. Los lotes con alto rendimiento a la semana 5 tienen una fuerte tendencia a aumentar el Consumo total.
 3.	PorcMortSem6 (Mortalidad Tardía): Los puntos Rojos (alta mortalidad) tienden ligeramente a la izquierda (disminuyen el consumo). Impacto: Esto tiene sentido: si hay más mortalidad al final, hay menos aves vivas consumiendo alimento en la etapa de mayor demanda.
 En Resumen: Para San Fernando S.A., este análisis es una guía para la logística de alimentos. El días de crianza y el peso semanal a la semana 5 son las métricas críticas que la gerencia debe usar para proyectar con exactitud las necesidades de alimento de cada lote y evitar sobre o sub-stock.
+
+### Grafico de Interpretacion Porcentaje Mortalidad Final
 
 ![SHAP](graficos/graficos_shap/Grafico_Interpretacion_PorcMortFinal.png)
 

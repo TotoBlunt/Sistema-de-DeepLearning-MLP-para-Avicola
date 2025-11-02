@@ -166,4 +166,11 @@ El prototipo de Streamlit (`pipeline_evaluacion_streamlit.py`) está diseñado c
 
 
 ---
+## ⚖️ Licencia
+
+Este proyecto se distribuye bajo la **Licencia MIT**.
+
+Eres libre de usar, modificar y distribuir este software, siempre y cuando se incluya el aviso de derechos de autor y el aviso de licencia en todas las copias o porciones sustanciales del software.
+
+Para más detalles, consulta el archivo [LICENSE.md](LICENSE) en el repositorio.
 
