@@ -152,8 +152,7 @@ El prototipo de Streamlit (`pipeline_evaluacion_streamlit.py`) está diseñado c
 ---
 
 ## 📈 Próximos Pasos
-- Integrar nuevas variables ambientales (temperatura, humedad, agua, cama).  
-- Incorporar interpretabilidad con SHAP o LIME dentro de la interfaz.  
+- Integrar nuevas variables ambientales (temperatura, humedad, agua, cama).   
 - Desarrollar dashboard de monitoreo con Power BI o Streamlit Analytics.  
 - Escalar el sistema a múltiples granjas y automatizar reentrenamiento periódico.  
 
