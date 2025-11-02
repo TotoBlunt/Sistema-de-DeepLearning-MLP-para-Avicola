@@ -48,17 +48,17 @@ Sistema-de-DeepLearning-MLP-para-Avicola/
 │   └── modelokeras.py              #Archivo de creacion y entrenamiento del Modelo
 │
 ├── 📁 graficos/   
-│   ├── 📁 graficos_shap          # Visualizaciones generadas durante la validación
-│    │   ├──Grafico_Interpretacion_ICA.png
+│   ├── 📁 graficos_shap                                  # Visualizaciones generadas durante la validación
+│    │   ├──Grafico_Interpretacion_ICA.png                    #GRaficos de Interpretacion SHAP
 │    │    ├──Grafico_Interpretacion_PesoPromFinal.png
 │   │    ├──Grafico_Interpretacion_PorcConsumo.png
 │    │    └──Grafico_Interpretacion_PorcMortFinal.png
-│   └── curva_loss.png             #Curva de Perdida loss
+│   └── curva_loss.png                                     #Curva de Perdida loss
 │
-├── pipeline_evaluacion_streamlit.py  # Versión del pipeline para predicción masiva, archivo principal
-├── requirements.txt              # Dependencias del proyecto
-├── Informe_Tecnico_MLP_Avicola.md   # Informe técnico formal del proyecto
-└── README.md                     # Descripción general 
+├── pipeline_evaluacion_streamlit.py      # Versión del pipeline para predicción masiva, archivo principal
+├── requirements.txt                      # Dependencias del proyecto
+├── Informe_Tecnico_MLP_Avicola.md       # Informe técnico formal del proyecto
+└── README.md                             # Descripción general 
 ```
 
 ---
@@ -134,3 +134,4 @@ Ejemplo de salida:
 
 
 ---
+
