@@ -162,7 +162,7 @@ El prototipo de Streamlit (`pipeline_evaluacion_streamlit.py`) está diseñado c
 **Jose Longa / Jhon Lozano**  
 📍 Lima, Perú  
 💼 Proyecto desarrollado en el marco del área de **Desarrollo de Sistemas Inteligentes**  
-🧾 [Informe Técnico Oficial](./Informe_Tecnico_MLP_Avicola.md)
+🧾 [Informe Técnico Oficial](./InformeTecnico.md)
 
 
 ---
