@@ -140,15 +140,15 @@ if modo_prediccion == "Manual":
                 with cols_f[col_index]:
                     manual_inputs[feat] = st.selectbox(f"**{feat}**", area_options, key=f"man_f_{feat}")
             elif feat == "Edad HTS":
-                # Definimos las opciones permitidas
-                edad_hts_opciones = [7, 14, 21, 22, 28, 35]
-                with cols_f[col_index]:
-                    # Usamos st.selectbox para restringir la selección
-                    manual_inputs[feat] = st.selectbox(
-                        f"**{feat}** (Restringido)", 
-                        options=edad_hts_opciones, 
-                        index=edad_hts_opciones.index(7), # Opcional: selecciona 7 por defecto
-                        key=f"man_f_{feat}")
+                # Definimos las opciones permitidas
+                edad_hts_opciones = [7, 14, 21, 22, 28, 35]
+                with cols_f[col_index]:
+                # Usamos st.selectbox para restringir la selección
+                    manual_inputs[feat] = st.selectbox(
+                        f"**{feat}** (Restringido)", 
+                        options=edad_hts_opciones, 
+                        index=edad_hts_opciones.index(7), # Opcional: selecciona 7 por defecto
+                        key=f"man_f_{feat}")
             else:
                 with cols_f[col_index]:
                     manual_inputs[feat] = st.number_input(f"**{feat}**", value=0.0, format="%0.4f", key=f"man_f_{feat}")
