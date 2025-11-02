@@ -60,7 +60,7 @@ Sistema-de-DeepLearning-MLP-para-Avicola/
 │
 ├── pipeline_evaluacion_streamlit.py      # Versión del pipeline para predicción masiva, archivo principal
 ├── requirements.txt                      # Dependencias del proyecto
-├── Informe_Tecnico_MLP_Avicola.md       # Informe técnico formal del proyecto
+├── InformeTecnico.md       # Informe técnico formal del proyecto
 └── README.md                             # Descripción general 
 ```
 
