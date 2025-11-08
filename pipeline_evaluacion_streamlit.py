@@ -109,7 +109,55 @@ metricas_seleccionadas = st.sidebar.multiselect(
     metricas_opciones,
     default=["MAE", "R2"]
 )
+
+# --- MODOS DE EVALUACIÓN Y SU EXPLICACIÓN ---
+st.sidebar.markdown("---")
+st.sidebar.subheader("Modos de Evaluación Adicional")
 modo = st.sidebar.selectbox(
+    "Modo de evaluación:",
+    ("score", "cluster", "ranking"),
+    key="modo_evaluacion"
+)
+
+# Explicación dinámica del modo de evaluación (el cambio solicitado)
+if modo == "score":
+    st.sidebar.markdown(
+        """
+        <div style='padding: 10px; border-radius: 8px; background-color: #e6f7ff; border: 1px solid #91d5ff;'>
+        **🎯 Score (Predicción Pura):** Genera directamente las cuatro predicciones de salida del modelo. Es ideal para obtener la estimación directa y monitorear el cumplimiento de objetivos.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+elif modo == "cluster":
+    st.sidebar.markdown(
+        """
+        <div style='padding: 10px; border-radius: 8px; background-color: #fff0e6; border: 1px solid #ffbb96;'>
+        **🧩 Cluster (Agrupación para Segmentación):** Aplica KMeans sobre las predicciones para agrupar las unidades en **segmentos homogéneos** (ej. "Alto Potencial" o "Alto Riesgo"). Permite la segmentación de estrategias de manejo.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    n_clusters = st.sidebar.number_input("Número de clusters", min_value=2, max_value=20, value=3, step=1)
+elif modo == "ranking":
+    st.sidebar.markdown(
+        """
+        <div style='padding: 10px; border-radius: 8px; background-color: #f0fff0; border: 1px solid #b7eb8f;'>
+        **🥇 Ranking (Clasificación por Prioridad):** Ordena las unidades de datos basándose en el valor de una **única predicción seleccionada**. Facilita la asignación de recursos limitados y la priorización de tareas.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    rank_by = st.sidebar.selectbox("Columna para ranking", [f"{t}_Pred" for t in TARGETS])
+
+# Inicialización de variables para evitar NameError en el flujo principal
+n_clusters = n_clusters if modo == "cluster" else None
+rank_by = rank_by if modo == "ranking" else None
+# --- FIN DE MODOS DE EVALUACIÓN Y SU EXPLICACIÓN ---
+
+
+)
+"""modo = st.sidebar.selectbox(
     "Modo de evaluación:",
     ("score", "cluster", "ranking")
 )
@@ -119,7 +167,7 @@ if modo == "cluster":
     n_clusters = st.sidebar.number_input("Número de clusters", min_value=2, max_value=20, value=3, step=1)
 if modo == "ranking":
     rank_by = st.sidebar.selectbox("Columna para ranking", [f"{t}_Pred" for t in TARGETS])
-
+"""
 # =================== LÓGICA PRINCIPAL ===================
 df_clean = None
 results_df = None
