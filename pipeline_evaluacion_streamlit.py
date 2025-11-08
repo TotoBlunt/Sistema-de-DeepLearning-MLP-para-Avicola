@@ -133,7 +133,7 @@ elif modo == "cluster":
     st.sidebar.markdown(
         """
         <div style='padding: 10px; border-radius: 8px; background-color: #fff0e6; border: 1px solid #ffbb96;'>
-        <strong>🧩 Cluster (Agrupación para Segmentación):</strong> Aplica KMeans sobre las predicciones para agrupar las unidades en **segmentos homogéneos** (ej. "Alto Potencial" o "Alto Riesgo"). Permite la segmentación de estrategias de manejo.
+        <strong>🧩 Cluster (Agrupación para Segmentación):</strong> Aplica KMeans sobre las predicciones para agrupar las unidades en <strong>segmentos homogéneos</strong> (ej. "Alto Potencial" o "Alto Riesgo"). Permite la segmentación de estrategias de manejo.
         </div>
         """,
         unsafe_allow_html=True
@@ -143,7 +143,7 @@ elif modo == "ranking":
     st.sidebar.markdown(
         """
         <div style='padding: 10px; border-radius: 8px; background-color: #f0fff0; border: 1px solid #b7eb8f;'>
-        <strong>🥇 Ranking (Clasificación por Prioridad):</strong> Ordena las unidades de datos basándose en el valor de una **única predicción seleccionada**. Facilita la asignación de recursos limitados y la priorización de tareas.
+        <strong>🥇 Ranking (Clasificación por Prioridad):</strong> Ordena las unidades de datos basándose en el valor de una <strong>predicción seleccionada</strong>. Facilita la asignación de recursos limitados y la priorización de tareas.
         </div>
         """,
         unsafe_allow_html=True
@@ -156,18 +156,6 @@ rank_by = rank_by if modo == "ranking" else None
 # --- FIN DE MODOS DE EVALUACIÓN Y SU EXPLICACIÓN ---
 
 
-
-"""modo = st.sidebar.selectbox(
-    "Modo de evaluación:",
-    ("score", "cluster", "ranking")
-)
-n_clusters = None
-rank_by = None
-if modo == "cluster":
-    n_clusters = st.sidebar.number_input("Número de clusters", min_value=2, max_value=20, value=3, step=1)
-if modo == "ranking":
-    rank_by = st.sidebar.selectbox("Columna para ranking", [f"{t}_Pred" for t in TARGETS])
-"""
 # =================== LÓGICA PRINCIPAL ===================
 df_clean = None
 results_df = None
