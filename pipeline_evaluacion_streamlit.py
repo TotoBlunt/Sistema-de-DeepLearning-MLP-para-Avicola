@@ -124,7 +124,7 @@ if modo == "score":
     st.sidebar.markdown(
         """
         <div style='padding: 10px; border-radius: 8px; background-color: #e6f7ff; border: 1px solid #91d5ff;'>
-        ** 🎯 Score (Predicción Pura): ** Genera directamente las cuatro predicciones de salida del modelo. Es ideal para obtener la estimación directa y monitorear el cumplimiento de objetivos.
+        **🎯Score (Predicción Pura):** Genera directamente las cuatro predicciones de salida del modelo. Es ideal para obtener la estimación directa y monitorear el cumplimiento de objetivos.
         </div>
         """,
         unsafe_allow_html=True
@@ -133,7 +133,7 @@ elif modo == "cluster":
     st.sidebar.markdown(
         """
         <div style='padding: 10px; border-radius: 8px; background-color: #fff0e6; border: 1px solid #ffbb96;'>
-        ** 🧩 Cluster (Agrupación para Segmentación): ** Aplica KMeans sobre las predicciones para agrupar las unidades en **segmentos homogéneos** (ej. "Alto Potencial" o "Alto Riesgo"). Permite la segmentación de estrategias de manejo.
+        **🧩Cluster(Agrupación para Segmentación):** Aplica KMeans sobre las predicciones para agrupar las unidades en **segmentos homogéneos** (ej. "Alto Potencial" o "Alto Riesgo"). Permite la segmentación de estrategias de manejo.
         </div>
         """,
         unsafe_allow_html=True
@@ -143,7 +143,7 @@ elif modo == "ranking":
     st.sidebar.markdown(
         """
         <div style='padding: 10px; border-radius: 8px; background-color: #f0fff0; border: 1px solid #b7eb8f;'>
-        ** 🥇 Ranking (Clasificación por Prioridad): ** Ordena las unidades de datos basándose en el valor de una **única predicción seleccionada**. Facilita la asignación de recursos limitados y la priorización de tareas.
+        **🥇Ranking(Clasificación por Prioridad):** Ordena las unidades de datos basándose en el valor de una **única predicción seleccionada**. Facilita la asignación de recursos limitados y la priorización de tareas.
         </div>
         """,
         unsafe_allow_html=True
