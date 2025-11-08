@@ -13,8 +13,8 @@ from sklearn.cluster import KMeans
 from tensorflow.keras.models import load_model # Importación necesaria aquí para evitar NameError en load_resources
 import shap
 
-# Asume que estas funciones están en utils/mlp_pipeline_utils.py
-# Si no lo están, asegúrate de que existen o define las funciones
+# Estas funciones están en utils/mlp_pipeline_utils.py
+#
 from utils.mlp_pipeline_utils import explic_shap, plot_boxplot_errores, plot_dispersion, plot_barras_metricas, plot_barras_r2,explicacion_metricas,explic_loss, explic_plot_comparacion, explic_plot_boxplot_errores,explic_metricas_error,explic_shap
 
 # =================== CONFIGURACIÓN Y CARGA DE RECURSOS ===================
@@ -225,6 +225,15 @@ else: # modo_prediccion == "Batch (archivo)"
             st.error(f"❌ Faltan las siguientes columnas de **entrada (FEATURES)** en el archivo: {missing_features}")
             st.stop()
         
+        # --- MODIFICACIÓN CLAVE: GUARDAR EL ID DEL GALPÓN ANTES DE LA LIMPIEZA ---
+        ID_COLUMN_NAME = 'Galpon' # Nombre de la columna que contiene el ID del galpón
+        df_id = None
+        if ID_COLUMN_NAME in df.columns:
+            df_id = df[ID_COLUMN_NAME].reset_index(drop=True)
+        else:
+            st.warning(f"⚠️ La columna de ID '{ID_COLUMN_NAME}' no se encontró en el archivo original. El CSV de resultados no lo incluirá.")
+        # --------------------------------------------------------------------------
+
         # 1. Limpieza y preparación (también preserva TARGETS si existen)
         df_clean = clean_data(df, le_area)
         
@@ -234,6 +243,11 @@ else: # modo_prediccion == "Batch (archivo)"
         # 3. Concatenación de resultados (preserva FEATURES y TARGETS originales/limpios)
         df_out = pd.concat([df_clean.reset_index(drop=True), results_df], axis=1)
 
+        # --- MODIFICACIÓN CLAVE: REINCORPORAR EL ID DEL GALPÓN ---
+        if df_id is not None:
+            if ID_COLUMN_NAME not in df_out.columns:
+                df_out.insert(0, ID_COLUMN_NAME, df_id) 
+        # ----------------------------------------------------------
         # 4. Modo de evaluación (Clustering / Ranking)
         if modo == "cluster":
             kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init='auto')
