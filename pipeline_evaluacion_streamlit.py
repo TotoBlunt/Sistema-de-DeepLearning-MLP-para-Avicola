@@ -156,7 +156,7 @@ rank_by = rank_by if modo == "ranking" else None
 # --- FIN DE MODOS DE EVALUACIÓN Y SU EXPLICACIÓN ---
 
 
-)
+
 """modo = st.sidebar.selectbox(
     "Modo de evaluación:",
     ("score", "cluster", "ranking")
