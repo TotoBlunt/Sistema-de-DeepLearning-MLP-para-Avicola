@@ -17,6 +17,7 @@ import shap
 #
 from utils.mlp_pipeline_utils import explic_shap, plot_boxplot_errores, plot_dispersion, plot_barras_metricas, plot_barras_r2,explicacion_metricas,explic_loss, explic_plot_comparacion, explic_plot_boxplot_errores,explic_metricas_error,explic_shap
 
+
 # =================== CONFIGURACIÓN Y CARGA DE RECURSOS ===================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "modelos", "modelo_9vars_multisalida.keras")
@@ -88,11 +89,12 @@ def predict_batch(df_features, model, X_scaler, y_scaler):
 
 # =================== INTERFAZ STREAMLIT ===================
 st.set_page_config(
-    page_title="Evaluación MLP Multisalida",
+    page_title="Prediccion Multisalida| San Fernando",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
+    page_icon="🧠"
 )
-st.title("📊 Evaluación de Modelo MLP Multisalida")
+st.title("🐔 Sistema Predictivo de Rendimiento Avicola basado en Integridad Intestinal")
 st.markdown("---")
 st.markdown("Sube tu archivo, escoge métricas y gráficas, y evalúa el modelo de forma interactiva.")
 
