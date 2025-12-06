@@ -215,7 +215,12 @@ if modo_prediccion == "Manual":
         results_df = predict_batch(df_clean_manual, model, X_scaler, y_scaler)
         
         # Concatenar resultados
-        df_out = pd.concat([df_manual.reset_index(drop=True), results_df], axis=1)
+        # Usamos df_clean_manual para las features y luego decodificamos 'Area'
+        df_out = pd.concat([df_clean_manual.reset_index(drop=True), results_df], axis=1)
+        # Decodificar 'Area' de número a texto para la visualización
+        if 'Area' in df_out.columns and le_area is not None:
+            df_out['Area'] = le_area.inverse_transform(df_out['Area'].astype(int))
+
         st.success("✅ Predicción manual completada")
         
         st.subheader("Resultados Predichos")
@@ -285,6 +290,12 @@ else: # modo_prediccion == "Batch (archivo)"
         if df_id is not None:
             if ID_COLUMN_NAME not in df_out.columns:
                 df_out.insert(0, ID_COLUMN_NAME, df_id) 
+
+        # --- MODIFICACIÓN CLAVE: DECODIFICAR 'Area' DE NÚMERO A TEXTO ---
+        if 'Area' in df_out.columns and le_area is not None:
+            df_out['Area'] = le_area.inverse_transform(df_out['Area'].astype(int))
+        # ----------------------------------------------------------------
+
         # ----------------------------------------------------------
         # 4. Modo de evaluación (Clustering / Ranking)
         if modo == "cluster":
@@ -482,5 +493,3 @@ else: # modo_prediccion == "Batch (archivo)"
         
     else: # Si el archivo no se ha subido
         st.info("A la espera de la carga del archivo.")
-
-
