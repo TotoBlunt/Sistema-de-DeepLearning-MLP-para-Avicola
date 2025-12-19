@@ -189,7 +189,10 @@ if modo_prediccion == "Manual":
                         key=f"man_f_{feat}")
             else:
                 with cols_f[col_index]:
-                    manual_inputs[feat] = st.number_input(f"**{feat}**", value=0.0, format="%0.4f", key=f"man_f_{feat}")
+                    if feat == 'Pob Inicial':
+                        manual_inputs[feat] = st.number_input(f"**{feat}**", value=0.0, min_value=0.0, format="%0.4f", key=f"man_f_{feat}")
+                    else:
+                        manual_inputs[feat] = st.number_input(f"**{feat}**", value=0.0, min_value=0.0, max_value=100.0, format="%0.4f", key=f"man_f_{feat}")
 
         # Formulario para entrada de Targets Reales (Opcional, para métricas)
         st.markdown("---")

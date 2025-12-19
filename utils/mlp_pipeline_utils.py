@@ -19,6 +19,7 @@ import json
 import matplotlib.pyplot as plt
 import shap
 from matplotlib.figure import Figure
+import textwrap
 
 FEATURES = [
     'PorcMortSem4','PorcMortSem5', 'PorcMortSem6','PesoSem4', 'PesoSem5', 'Pob Inicial',
@@ -420,15 +421,14 @@ El mensaje clave es que el error es **mínimo** en las métricas de eficiencia p
 
 
 def explic_shap():
-    mensaje = """
+    mensaje = textwrap.dedent("""
     #### 🎨 Gráficos de Interpretabilidad SHAP
     💡 Los siguientes gráficos fueron generados previamente en local usando los datos de entrenamiento escalados y el modelo final.
     ### 💡 Interpretación de Contribución (SHAP Summary Plot):
-        * **Cada punto** representa una predicción en el lote actual.
-        * **El color (Rojo/Azul)** indica el valor de la variable de entrada (Feature). **Rojo** es alto, **Azul** es bajo.
-        * **El eje horizontal (Valor SHAP)** indica el impacto en la predicción.
-        * Un punto muy a la **derecha** significa que esa característica **aumentó** fuertemente la predicción del target.
-        * Un punto muy a la **izquierda** significa que esa característica **disminuyó** fuertemente la predicción del target.
-    
-    """
+    * **Cada punto** representa una predicción en el lote actual.
+    * **El color (Rojo/Azul)** indica el valor de la variable de entrada (Feature). **Rojo** es alto, **Azul** es bajo.
+    * **El eje horizontal (Valor SHAP)** indica el impacto en la predicción.
+    * Un punto muy a la **derecha** significa que esa característica **aumentó** fuertemente la predicción del target.
+    * Un punto muy a la **izquierda** significa que esa característica **disminuyó** fuertemente la predicción del target.
+    """)
     return mensaje
