@@ -203,7 +203,7 @@ if modo_prediccion == "Manual":
         for i, target in enumerate(TARGETS):
             with cols_t[i]:
                 # Usamos None o 0.0, pero None es mejor para saber si fue llenado
-                y_true_inputs[target] = st.number_input(f"**{target}** (Real)", value=None, format="%0.4f", key=f"man_t_{target}")
+                y_true_inputs[target] = st.number_input(f"**{target}** (Real)", value=None, min_value=0.0, max_value=100.0, format="%0.4f", key=f"man_t_{target}")
 
         submitted = st.form_submit_button("🚀 Predecir y Evaluar", type="primary")
 
