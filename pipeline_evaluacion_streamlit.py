@@ -35,7 +35,7 @@ def check_login():
         col1, col2, col3 = st.columns([1, 1, 1])
         with col2:
             st.markdown("<br><br>", unsafe_allow_html=True)
-            st.markdown("<h1 style='text-align: center;'>🔐 Acceso al Sistema</h1>", unsafe_allow_html=True)
+            st.markdown("<h1 style='text-align: center;'>🔐 🐥 Acceso al Sistema</h1>", unsafe_allow_html=True)
             st.markdown("<p style='text-align: center; color: gray;'>Ingrese sus credenciales para continuar</p>", unsafe_allow_html=True)
             
             with st.form("login_form"):
@@ -154,6 +154,11 @@ def predict_batch(df_features, model, X_scaler, y_scaler):
 st.title("🐔 Sistema Predictivo de Rendimiento Avicola basado en Integridad Intestinal")
 st.markdown("---")
 st.markdown("Sube tu archivo, escoge métricas y gráficas, y evalúa el modelo de forma interactiva.")
+
+# Botón de Cerrar Sesión en la barra lateral
+if st.sidebar.button("🚪 Cerrar Sesión"):
+    st.session_state['authenticated'] = False
+    st.rerun()
 
 # Sidebar para selección de métricas y gráficas
 st.sidebar.header("Modo de predicción")
