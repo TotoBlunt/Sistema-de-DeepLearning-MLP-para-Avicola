@@ -18,6 +18,44 @@ import shap
 from utils.mlp_pipeline_utils import explic_shap, plot_boxplot_errores, plot_dispersion, plot_barras_metricas, plot_barras_r2,explicacion_metricas,explic_loss, explic_plot_comparacion, explic_plot_boxplot_errores,explic_metricas_error,explic_shap
 
 
+# =================== CONFIGURACIÓN INICIAL Y LOGIN ===================
+st.set_page_config(
+    page_title="Prediccion Multisalida| San Fernando",
+    layout="wide",
+    initial_sidebar_state="expanded",
+    page_icon="🧠"
+)
+
+def check_login():
+    if 'authenticated' not in st.session_state:
+        st.session_state['authenticated'] = False
+
+    if not st.session_state['authenticated']:
+        # Interfaz de Login Minimalista y Centrada
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col2:
+            st.markdown("<br><br>", unsafe_allow_html=True)
+            st.markdown("<h1 style='text-align: center;'>🔐 Acceso al Sistema</h1>", unsafe_allow_html=True)
+            st.markdown("<p style='text-align: center; color: gray;'>Ingrese sus credenciales para continuar</p>", unsafe_allow_html=True)
+            
+            with st.form("login_form"):
+                user = st.text_input("Usuario", placeholder="admin")
+                password = st.text_input("Contraseña", type="password", placeholder="•••••")
+                submit = st.form_submit_button("Ingresar", use_container_width=True)
+            
+            if submit:
+                if user == "admin" and password == "admin":
+                    st.session_state['authenticated'] = True
+                    st.rerun()
+                else:
+                    st.error("❌ Usuario o contraseña incorrectos")
+        return False
+    return True
+
+if not check_login():
+    st.stop()
+
+
 # =================== CONFIGURACIÓN Y CARGA DE RECURSOS ===================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "modelos", "modelo_9vars_multisalida.keras")
@@ -113,12 +151,6 @@ def predict_batch(df_features, model, X_scaler, y_scaler):
     return results_df
 
 # =================== INTERFAZ STREAMLIT ===================
-st.set_page_config(
-    page_title="Prediccion Multisalida| San Fernando",
-    layout="wide",
-    initial_sidebar_state="expanded",
-    page_icon="🧠"
-)
 st.title("🐔 Sistema Predictivo de Rendimiento Avicola basado en Integridad Intestinal")
 st.markdown("---")
 st.markdown("Sube tu archivo, escoge métricas y gráficas, y evalúa el modelo de forma interactiva.")
