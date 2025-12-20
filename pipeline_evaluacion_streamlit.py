@@ -68,13 +68,26 @@ def clean_data(df, le_area=None):
     df_features_targets = df_features_targets.dropna(subset=FEATURES)
     
     if 'Area' in FEATURES and le_area is not None and 'Area' in df_features_targets.columns:
-        try:
-            # La columna 'Area' debe ser string antes de la transformación
-            df_features_targets['Area'] = le_area.transform(df_features_targets['Area'].astype(str))
-        except ValueError:
-            st.warning("Advertencia: Se encontraron categorías de 'Area' no vistas durante el entrenamiento. Los datos no codificables serán omitidos.")
-            # Si esto ocurre, podrías necesitar una estrategia más robusta (ej. imputación, o saltar la fila)
-            pass
+        # Asegurar que es string
+        df_features_targets['Area'] = df_features_targets['Area'].astype(str)
+        
+        # Identificar categorías válidas (vistas en el entrenamiento)
+        valid_categories = set(le_area.classes_)
+        mask_valid = df_features_targets['Area'].isin(valid_categories)
+        
+        # Si hay categorías desconocidas, filtrar y avisar
+        if not mask_valid.all():
+            n_omitted = (~mask_valid).sum()
+            st.warning(f"Advertencia: Se encontraron {n_omitted} registros con categorías de 'Area' no vistas durante el entrenamiento. Estos registros serán omitidos para evitar errores.")
+            df_features_targets = df_features_targets[mask_valid].copy()
+            
+        # Verificar si quedaron datos
+        if df_features_targets.empty:
+            st.error("Error: No quedaron datos válidos después de filtrar las categorías desconocidas. Verifique que los nombres de 'Area' coincidan con los del entrenamiento.")
+            st.stop()
+
+        # Transformar los datos (ahora es seguro porque filtramos los desconocidos)
+        df_features_targets['Area'] = le_area.transform(df_features_targets['Area'])
             
     return df_features_targets
 
