@@ -78,7 +78,8 @@ def clean_data(df, le_area=None):
         # Si hay categorías desconocidas, filtrar y avisar
         if not mask_valid.all():
             n_omitted = (~mask_valid).sum()
-            st.warning(f"Advertencia: Se encontraron {n_omitted} registros con categorías de 'Area' no vistas durante el entrenamiento. Estos registros serán omitidos para evitar errores.")
+            invalid_cats = df_features_targets.loc[~mask_valid, 'Area'].unique()
+            st.warning(f"Advertencia: Se encontraron {n_omitted} registros con categorías de 'Area' no vistas durante el entrenamiento: {', '.join(invalid_cats)}. Estos registros serán omitidos para evitar errores.")
             df_features_targets = df_features_targets[mask_valid].copy()
             
         # Verificar si quedaron datos
