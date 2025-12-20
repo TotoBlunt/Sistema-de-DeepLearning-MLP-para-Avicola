@@ -65,7 +65,17 @@ def clean_data(df, le_area=None):
     df = df.copy()
     # Solo trabajamos con las features que el modelo necesita
     df_features_targets = df[[col for col in FEATURES + TARGETS if col in df.columns]].copy()
-    df_features_targets = df_features_targets.dropna(subset=FEATURES)
+    
+    # --- Limpieza robusta de columnas numéricas ---
+    # Convertir a números, manejando posibles strings con comas o errores
+    numeric_cols = [col for col in FEATURES if col != 'Area' and col in df_features_targets.columns]
+    for col in numeric_cols:
+        if df_features_targets[col].dtype == 'object':
+            df_features_targets[col] = df_features_targets[col].astype(str).str.replace(',', '.')
+        df_features_targets[col] = pd.to_numeric(df_features_targets[col], errors='coerce')
+
+    # Eliminar filas con nulos (incluyendo los que fallaron la conversión)
+    df_features_targets = df_features_targets.dropna(subset=[c for c in FEATURES if c in df_features_targets.columns])
     
     if 'Area' in FEATURES and le_area is not None and 'Area' in df_features_targets.columns:
         # Asegurar que es string
