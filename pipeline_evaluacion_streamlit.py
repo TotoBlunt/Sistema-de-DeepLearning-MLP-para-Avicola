@@ -343,7 +343,7 @@ else: # modo_prediccion == "Batch (archivo)"
         st.success("✅ Evaluación completada")
         st.subheader("Resultados de la Evaluación (primeros 10 registros)")
         st.dataframe(df_out.head(10))
-        csv = df_out.to_csv(index=False).encode('utf-8')
+        csv = df_out.to_csv(index=False).encode('utf-8-sig')
         st.download_button(
             label="⬇️ Descargar resultados en CSV",
             data=csv,
