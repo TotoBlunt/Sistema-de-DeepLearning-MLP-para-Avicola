@@ -273,7 +273,12 @@ else: # modo_prediccion == "Batch (archivo)"
     if uploaded_file is not None:
         try:
             if uploaded_file.name.endswith('.csv'):
-                df = pd.read_csv(uploaded_file, encoding='latin1')
+                # Intentar leer primero con utf-8 (estándar), si falla usar latin1
+                try:
+                    df = pd.read_csv(uploaded_file, encoding='utf-8')
+                except UnicodeDecodeError:
+                    uploaded_file.seek(0) # Regresar al inicio del archivo
+                    df = pd.read_csv(uploaded_file, encoding='latin1')
             else:
                 df = pd.read_excel(uploaded_file)
         except Exception as e:
