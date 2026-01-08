@@ -44,7 +44,9 @@ def check_login():
                 submit = st.form_submit_button("Ingresar", use_container_width=True)
             
             if submit:
-                if user == "admin" and password == "admin":
+                if not user.isalnum():
+                    st.error("❌ El usuario solo debe contener letras y números (sin espacios ni caracteres especiales).")
+                elif user == "admin" and password == "admin":
                     st.session_state['authenticated'] = True
                     st.rerun()
                 else:
