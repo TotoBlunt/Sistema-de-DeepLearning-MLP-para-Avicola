@@ -38,19 +38,27 @@ def check_login():
             st.markdown("<h1 style='text-align: center;'>🔐 🐥 Acceso al Sistema</h1>", unsafe_allow_html=True)
             st.markdown("<p style='text-align: center; color: gray;'>Ingrese sus credenciales para continuar</p>", unsafe_allow_html=True)
             
+            # Diccionario de usuarios y roles (Simulación de Base de Datos)
+            users_db = {
+                "admin": "Administrador",
+                "veterinario": "Veterinario Jefe",
+                "gerente": "Gerente de Producción",
+                "analista": "Analista de Datos"
+            }
+
             with st.form("login_form"):
-                user = st.text_input("Usuario", placeholder="admin")
+                user = st.text_input("Usuario", placeholder="Ej. veterinario")
                 password = st.text_input("Contraseña", type="password", placeholder="•••••")
                 submit = st.form_submit_button("Ingresar", use_container_width=True)
             
             if submit:
-                if not user.isalnum():
-                    st.error("❌ El usuario solo debe contener letras y números (sin espacios ni caracteres especiales).")
-                elif user == "admin" and password == "admin":
+                if user in users_db and password == "admin":
                     st.session_state['authenticated'] = True
+                    st.session_state['username'] = user
+                    st.session_state['role'] = users_db[user]
                     st.rerun()
                 else:
-                    st.error("❌ Usuario o contraseña incorrectos")
+                    st.error("❌ Usuario no registrado o contraseña incorrecta")
         return False
     return True
 
@@ -288,6 +296,10 @@ if modo_prediccion == "Manual":
         if 'Area' in df_out.columns and le_area is not None:
             df_out['Area'] = le_area.inverse_transform(df_out['Area'].astype(int))
 
+        # Agregar información del usuario responsable
+        df_out['Usuario_Responsable'] = st.session_state.get('username', 'Desconocido')
+        df_out['Cargo_Responsable'] = st.session_state.get('role', 'No especificado')
+
         st.success("✅ Predicción manual completada")
         
         st.subheader("Resultados Predichos")
@@ -378,6 +390,10 @@ else: # modo_prediccion == "Batch (archivo)"
         if modo == "ranking":
             df_out = df_out.sort_values(by=rank_by, ascending=False)
             df_out['Ranking'] = np.arange(1, len(df_out)+1)
+
+        # Agregar información del usuario responsable al reporte final
+        df_out['Usuario_Responsable'] = st.session_state.get('username', 'Desconocido')
+        df_out['Cargo_Responsable'] = st.session_state.get('role', 'No especificado')
 
         st.success("✅ Evaluación completada")
         st.subheader("Resultados de la Evaluación (primeros 10 registros)")
