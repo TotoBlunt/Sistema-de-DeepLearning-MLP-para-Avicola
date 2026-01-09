@@ -40,14 +40,16 @@ def check_login():
             
             # Diccionario de usuarios y roles (Simulación de Base de Datos)
             users_db = {
-                "admin": "Administrador",
-                "veterinario": "Veterinario Jefe",
-                "gerente": "Gerente de Producción",
-                "analista": "Analista de Datos"
+                "Admin": "Administrador",
+                "Veterinario": "Veterinario Jefe",
+                "Gerente": "Gerente de Producción",
+                "Analista": "Analista de Datos",
+                "Jhon": "Analista de Datos",
+                "Jose": "Analista de Datos"
             }
 
             with st.form("login_form"):
-                user = st.text_input("Usuario", placeholder="Ej. veterinario")
+                user = st.text_input("Usuario", placeholder="Ej. veterinario").capitalize()
                 password = st.text_input("Contraseña", type="password", placeholder="•••••")
                 submit = st.form_submit_button("Ingresar", use_container_width=True)
             
