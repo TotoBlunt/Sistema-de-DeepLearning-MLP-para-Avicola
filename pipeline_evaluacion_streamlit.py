@@ -54,7 +54,9 @@ def check_login():
                 submit = st.form_submit_button("Ingresar", use_container_width=True)
             
             if submit:
-                if user in users_db and password == "admin":
+                if not user.isalnum():
+                    st.error("❌ El usuario solo debe contener letras y números (sin espacios ni caracteres especiales).")
+                elif user in users_db and password == "admin":
                     st.session_state['authenticated'] = True
                     st.session_state['username'] = user
                     st.session_state['role'] = users_db[user]
@@ -398,11 +400,12 @@ else: # modo_prediccion == "Batch (archivo)"
         df_out['Cargo_Responsable'] = st.session_state.get('role', 'No especificado')
 
         st.success("✅ Evaluación completada")
-        st.subheader("Resultados de la Evaluación (primeros 10 registros)")
+        st.write(f"**Total de registros procesados:** {len(df_out)}")
+        st.subheader("Resultados de la Evaluación (Vista previa - Primeros 10)")
         st.dataframe(df_out.head(10))
         csv = df_out.to_csv(index=False).encode('utf-8-sig')
         st.download_button(
-            label="⬇️ Descargar resultados en CSV",
+            label=f"⬇️ Descargar resultados completos ({len(df_out)} registros)",
             data=csv,
             file_name="resultados_evaluacion.csv",
             mime="text/csv"
