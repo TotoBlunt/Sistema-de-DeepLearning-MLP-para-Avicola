@@ -55,7 +55,7 @@ def check_login():
             
             if submit:
                 if not user.isalnum():
-                    st.error("❌ El usuario solo debe contener letras y números (sin espacios ni caracteres especiales).")
+                    st.error("❌ El usuario solo debe contener letras y/o números (sin espacios ni caracteres especiales).")
                 elif user in users_db and password == "admin":
                     st.session_state['authenticated'] = True
                     st.session_state['username'] = user
