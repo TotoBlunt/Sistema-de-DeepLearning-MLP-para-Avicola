@@ -405,7 +405,7 @@ else: # modo_prediccion == "Batch (archivo)"
         st.dataframe(df_out.head(10))
         csv = df_out.to_csv(index=False).encode('utf-8-sig')
         st.download_button(
-            label=f"⬇️ Descargar resultados {len(df_out)} registros)",
+            label=f"⬇️ Descargar resultados ({len(df_out)} registros)",
             data=csv,
             file_name="resultados_evaluacion.csv",
             mime="text/csv"
